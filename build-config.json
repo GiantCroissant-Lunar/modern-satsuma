@@ -1,0 +1,16 @@
+{
+  "project": {
+    "name": "modern-satsuma",
+    "displayName": "Plate.ModernSatsuma",
+    "description": "Modernized Satsuma Graph Library for .NET"
+  },
+  "build": {
+    "solution": "dotnet/framework/Plate.ModernSatsuma.sln",
+    "configuration": "Release",
+    "artifactPath": "build/_artifacts"
+  },
+  "versioning": {
+    "strategy": "semver",
+    "initialVersion": "0.1.0"
+  }
+}

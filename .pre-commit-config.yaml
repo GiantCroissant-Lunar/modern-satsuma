@@ -1,0 +1,99 @@
+# Pre-commit configuration for modern-satsuma
+# See https://pre-commit.com for more information
+
+repos:
+  # Basic file hygiene and common checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: |
+          (?x)^(
+            dotnet/.*/bin/.*|
+            dotnet/.*/obj/.*|
+            dotnet/.*\.(cs|vb|fs)|
+            .*\.md
+          )$
+      - id: end-of-file-fixer
+        exclude: ^(dotnet/.*/bin/.*|dotnet/.*/obj/.*)$
+      - id: check-json
+        exclude: ^(dotnet/.*/bin/.*|dotnet/.*/obj/.*)$
+      - id: check-xml
+        exclude: ^(dotnet/.*/bin/.*|dotnet/.*/obj/.*)$
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+        exclude: ^(dotnet/.*/bin/.*|dotnet/.*/obj/.*)$
+      - id: detect-private-key
+
+  # Secret detection (GitLeaks)
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+
+  # Python linting and formatting (for build scripts)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.13.2
+    hooks:
+      - id: ruff-check
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^scripts/.*\.py$
+      - id: ruff-format
+        files: ^scripts/.*\.py$
+
+  # YAML linting
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.1
+    hooks:
+      - id: yamllint
+        args: [-d, relaxed]
+        files: \.(yaml|yml)$
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.45.0
+    hooks:
+      - id: markdownlint
+        args: ['--fix', '--disable', 'MD013']
+
+  # Hook Validator - .NET specific validation and formatting
+  - repo: local
+    hooks:
+      # Auto-format C# code with dotnet format
+      - id: format-dotnet
+        name: Format C# code with dotnet format
+        entry: python3 ../hook-validator/python/src/validators/dotnet/format_code.py
+        language: system
+        files: \.cs$
+        pass_filenames: true
+
+      # Check for debug statements
+      - id: check-debug-statements
+        name: Check for Debug Statements
+        entry: bash -c 'if grep -rn "Debugger.Break" --include="*.cs" "$@"; then echo "Debug statements found!"; exit 1; fi'
+        language: system
+        files: \.cs$
+        exclude: '(Tests?/|/obj/|/bin/)'
+
+# Configuration
+default_stages: [pre-commit]
+fail_fast: false
+minimum_pre_commit_version: 3.0.0
+
+# Global exclusions
+exclude: |
+  (?x)^(
+    .*\.min\..*|
+    .*\.generated\..*|
+    .*/obj/.*|
+    .*/bin/.*|
+    .*/node_modules/.*|
+    .*\.Designer\.cs|
+    .*\.g\.cs|
+    .*\.g\.i\.cs
+  )$

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>Plate.ModernSatsuma</PackageId>
+    <Version>1.0.0-alpha.1</Version>
+    <Authors>Winged Bean Team</Authors>
+    <Description>Modernized Satsuma graph library for .NET Standard</Description>
+    
+    <!-- Suppress internal nullable warnings until full RFC-002 implementation -->
+    <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8625</NoWarn>
+  </PropertyGroup>
+
+  <!-- Exclude Drawing.cs for .NET Standard 2.0 - System.Drawing is deprecated -->
+  <ItemGroup>
+    <Compile Remove="Drawing.cs" />
+    <None Include="Drawing.cs" />
+  </ItemGroup>
+
+</Project>
