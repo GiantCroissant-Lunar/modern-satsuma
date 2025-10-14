@@ -8,7 +8,7 @@ This directory contains Request for Comments (RFC) documents for modernizing the
 |-----|-------|--------|----------|
 | [RFC-001](./RFC-001-critical-build-fixes.md) | Critical Build Fixes | ✅ Implemented | P0 - Critical |
 | [RFC-002](./RFC-002-nullable-reference-types.md) | Nullable Reference Types | ⚠️ Partial | P1 - High |
-| [RFC-003](./RFC-003-modern-csharp-syntax.md) | Modern C# Syntax Adoption | 🔴 Proposed | P1 - High |
+| [RFC-003](./RFC-003-modern-csharp-syntax.md) | Modern C# Syntax Adoption | ⚠️ Partial | P1 - High |
 | [RFC-004](./RFC-004-api-modernization.md) | API Surface Modernization | 🔴 Proposed | P2 - Medium |
 | [RFC-005](./RFC-005-performance-optimization.md) | Performance & Memory Optimization | 🔴 Proposed | P3 - Low |
 
