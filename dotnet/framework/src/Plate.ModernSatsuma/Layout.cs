@@ -146,7 +146,7 @@ namespace Plate.ModernSatsuma.Drawing
 		public ForceDirectedLayout(IGraph graph, Func<Node, PointD> initialPositions = null)
 		{
 			Graph = graph;
-			NodePositions = new Dictionary<Node, PointD>();
+			NodePositions = new();
 			SpringForce = (d => 2 * Math.Log(d));
 			ElectricForce = (d => 1 / (d * d));
 			TemperatureAttenuation = DefaultTemperatureAttenuation;
@@ -175,7 +175,7 @@ namespace Plate.ModernSatsuma.Drawing
 		/// Performs an optimization step.
 		public void Step()
 		{
-			Dictionary<Node, PointD> forces = new Dictionary<Node, PointD>();
+			Dictionary<Node, PointD> forces = new();
 
 			foreach (var u in Graph.Nodes())
 			{

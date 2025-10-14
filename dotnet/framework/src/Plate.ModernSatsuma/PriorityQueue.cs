@@ -45,9 +45,9 @@ public interface IPriorityQueue<TElement, TPriority>
 public sealed class PriorityQueue<TElement, TPriority> : IPriorityQueue<TElement, TPriority>
 	where TPriority : IComparable<TPriority>
 {
-	private List<TElement> payloads = new List<TElement>();
-	private List<TPriority> priorities = new List<TPriority>();
-	private Dictionary<TElement, int> positions = new Dictionary<TElement, int>();
+	private List<TElement> payloads = new();
+	private List<TPriority> priorities = new();
+	private Dictionary<TElement, int> positions = new();
 
 	public void Clear()
 	{
@@ -56,10 +56,7 @@ public sealed class PriorityQueue<TElement, TPriority> : IPriorityQueue<TElement
 		positions.Clear();
 	}
 
-	public int Count
-	{
-		get { return payloads.Count; }
-	}
+	public int Count => payloads.Count;
 
 	public IEnumerable<KeyValuePair<TElement, TPriority>> Items
 	{

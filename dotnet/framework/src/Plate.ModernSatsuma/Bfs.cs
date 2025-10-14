@@ -35,8 +35,8 @@ public sealed class Bfs
 	{
 		Graph = graph;
 
-		parentArc = new Dictionary<Node, Arc>();
-		level = new Dictionary<Node, int>();
+		parentArc = new();
+		level = new();
 		queue = new Queue<Node>();
 	}
 
@@ -118,14 +118,11 @@ public sealed class Bfs
 	/// - Each reached node is either a source, or has a <b>parent arc</b>. (see #GetParentArc)
 	/// - At the beginning, only the source nodes are reached. (see #AddSource)
 	/// \sa ReachedNodes
-	public bool Reached(Node x)
-	{
-		return parentArc.ContainsKey(x);
-	}
+	public bool Reached(Node x) => parentArc.ContainsKey(x);
 
 	/// Returns the reached nodes.
 	/// \sa Reached
-	public IEnumerable<Node> ReachedNodes { get { return parentArc.Keys; } }
+	public IEnumerable<Node> ReachedNodes => parentArc.Keys;
 
 	/// Gets the current distance from the set of source nodes
 	/// (that is, its level in the Bfs forest).
@@ -160,5 +157,17 @@ public sealed class Bfs
 			node = Graph.Other(arc, node);
 		}
 		return result;
+	}
+
+	/// <summary>
+	/// Attempts to get a shortest path from the sources to a node.
+	/// </summary>
+	/// <param name="node">The target node.</param>
+	/// <param name="path">The path if the node has been reached, null otherwise.</param>
+	/// <returns>True if the node has been reached, false otherwise.</returns>
+	public bool TryGetPath(Node node, out IPath? path)
+	{
+		path = GetPath(node);
+		return path != null;
 	}
 }

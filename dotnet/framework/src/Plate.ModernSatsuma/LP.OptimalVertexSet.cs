@@ -53,7 +53,7 @@ namespace Plate.ModernSatsuma.LP
 			Debug.Assert(SolutionType != SolutionType.Unbounded);
 			if (solution.Valid)
 			{
-				Nodes = new HashSet<Node>();
+				Nodes = new();
 				foreach (var kv in solution.Primal)
 				{
 					if (kv.Value > 0.5)
@@ -137,7 +137,7 @@ namespace Plate.ModernSatsuma.LP
 			Debug.Assert(SolutionType != SolutionType.Unbounded);
 			if (solution.Valid)
 			{
-				Nodes = new Dictionary<Node, double>();
+				Nodes = new();
 				foreach (var kv in solution.Primal)
 				{
 					if (kv.Value > 0)

@@ -141,8 +141,8 @@ public sealed class Bipartition
 	public Bipartition(IGraph graph, Flags flags = 0)
 	{
 		Graph = graph;
-		if (0 != (flags & Flags.CreateRedNodes)) RedNodes = new HashSet<Node>();
-		if (0 != (flags & Flags.CreateBlueNodes)) BlueNodes = new HashSet<Node>();
+		if (0 != (flags & Flags.CreateRedNodes)) RedNodes = new();
+		if (0 != (flags & Flags.CreateBlueNodes)) BlueNodes = new();
 		new MyDfs { Parent = this }.Run(graph);
 	}
 }
@@ -177,7 +177,7 @@ public sealed class TopologicalOrder
 		{
 			direction = Direction.Forward;
 			Parent.Acyclic = true;
-			exited = new HashSet<Node>();
+			exited = new();
 		}
 
 		protected override bool NodeEnter(Node node, Arc arc)
@@ -221,7 +221,7 @@ public sealed class TopologicalOrder
 	public TopologicalOrder(IGraph graph, Flags flags = 0)
 	{
 		Graph = graph;
-		if (0 != (flags & Flags.CreateOrder)) Order = new List<Node>();
+		if (0 != (flags & Flags.CreateOrder)) Order = new();
 		new MyDfs { Parent = this }.Run(graph);
 	}
 }
@@ -254,7 +254,7 @@ public sealed class StrongComponents
 		protected override void Start(out Direction direction)
 		{
 			direction = Direction.Forward;
-			ReverseExitOrder = new List<Node>();
+			ReverseExitOrder = new();
 		}
 
 		protected override bool NodeExit(Node node, Arc arc)
@@ -317,8 +317,8 @@ internal class LowpointDfs : Dfs
 	protected override void Start(out Direction direction)
 	{
 		direction = Direction.Undirected;
-		level = new Dictionary<Node, int>();
-		lowpoint = new Dictionary<Node, int>();
+		level = new();
+		lowpoint = new();
 	}
 
 	protected override bool NodeEnter(Node node, Arc arc)
@@ -361,7 +361,7 @@ internal class BridgeDfs : LowpointDfs
 	{
 		base.Start(out direction);
 		ComponentCount = 0;
-		Bridges = new HashSet<Arc>();
+		Bridges = new();
 	}
 
 	protected override bool NodeExit(Node node, Arc arc)
@@ -498,7 +498,7 @@ public class BiNodeConnectedComponents
 					Parent.Count++;
 					if (Parent.Components != null)
 					{
-						HashSet<Node> block = new HashSet<Node>();
+						HashSet<Node> block = new();
 						while (true)
 						{
 							Node n = blockStack.Pop();
@@ -519,7 +519,7 @@ public class BiNodeConnectedComponents
 	{
 		Graph = graph;
 		if (0 != (flags & Flags.CreateComponents)) Components = new List<HashSet<Node>>();
-		if (0 != (flags & Flags.CreateCutvertices)) Cutvertices = new Dictionary<Node, int>();
+		if (0 != (flags & Flags.CreateCutvertices)) Cutvertices = new();
 		new BlockDfs { Parent = this }.Run(graph);
 	}
 }
@@ -543,7 +543,7 @@ public static class FindPathExtensions
 			direction = PathDirection;
 
 			StartNode = Node.Invalid;
-			Path = new List<Arc>();
+			Path = new();
 			EndNode = Node.Invalid;
 		}
 

@@ -79,9 +79,9 @@ public sealed class Dijkstra
 		Mode = mode;
 		NullCost = (mode == DijkstraMode.Sum ? 0 : double.NegativeInfinity);
 
-		distance = new Dictionary<Node, double>();
-		parentArc = new Dictionary<Node, Arc>();
-		priorityQueue = new PriorityQueue<Node, double>();
+		distance = new();
+		parentArc = new();
+		priorityQueue = new();
 	}
 
 	private void ValidateCost(double c)
@@ -191,7 +191,7 @@ public sealed class Dijkstra
 
 	/// Returns the reached nodes.
 	/// \sa Reached
-	public IEnumerable<Node> ReachedNodes { get { return parentArc.Keys; } }
+	public IEnumerable<Node> ReachedNodes => parentArc.Keys;
 
 	/// Returns whether a node has been fixed.
 	/// - A node is called \e reached if it belongs to the current forest of cheapest paths. (see #Reached)
@@ -208,7 +208,7 @@ public sealed class Dijkstra
 
 	/// Returns the fixed nodes.
 	/// \sa Fixed
-	public IEnumerable<Node> FixedNodes { get { return distance.Keys; } }
+	public IEnumerable<Node> FixedNodes => distance.Keys;
 
 	/// Gets the cost of the current cheapest path from the source nodes to a given node
 	/// (that is, its distance from the sources).
@@ -243,5 +243,17 @@ public sealed class Dijkstra
 			node = Graph.Other(arc, node);
 		}
 		return result;
+	}
+
+	/// <summary>
+	/// Attempts to get the current cheapest path from the source nodes to a given node.
+	/// </summary>
+	/// <param name="node">The target node.</param>
+	/// <param name="path">The path if the node has been reached, null otherwise.</param>
+	/// <returns>True if the node has been reached, false otherwise.</returns>
+	public bool TryGetPath(Node node, out IPath? path)
+	{
+		path = GetPath(node);
+		return path != null;
 	}
 }

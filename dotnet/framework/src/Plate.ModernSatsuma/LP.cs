@@ -169,28 +169,22 @@ namespace Plate.ModernSatsuma.LP
 		/// Initializes a constant expression.
 		public Expression(double bias = 0)
 		{
-			Coefficients = new Dictionary<Variable, double>();
+			Coefficients = new();
 			Bias = bias;
 		}
 
 		/// Makes a copy of the supplied Expression.
 		public Expression(Expression x)
 		{
-			Coefficients = new Dictionary<Variable, double>();
+			Coefficients = new();
 			foreach (Variable v in x.Coefficients.Keys)
 				Coefficients[v] = x.Coefficients[v];
 			Bias = x.Bias;
 		}
 
-		public bool IsConstant
-		{
-			get { return Coefficients.Count == 0; }
-		}
+		public bool IsConstant => Coefficients.Count == 0;
 
-		public bool IsZero
-		{
-			get { return Coefficients.Count == 0 && Bias == 0; }
-		}
+		public bool IsZero => Coefficients.Count == 0 && Bias == 0;
 
 		public void Add(Variable v, double coeff)
 		{
@@ -420,9 +414,9 @@ namespace Plate.ModernSatsuma.LP
 		{
 			Mode = OptimizationMode.Minimize;
 			Objective = new Expression();
-			Constraints = new List<Constraint>();
-			Variables = new Dictionary<object, Variable>();
-			VariablesBySerialNumber = new List<Variable>();
+			Constraints = new();
+			Variables = new();
+			VariablesBySerialNumber = new();
 		}
 		
 		/// Looks up an existing variable by its Id or creates a new one.
@@ -582,7 +576,7 @@ namespace Plate.ModernSatsuma.LP
 		/// The Problem whose solution this is.
 		public Problem Problem;
 		/// True if this is a valid solution to the problem.
-		public bool Valid { get { return Type == SolutionType.Unbounded || Type == SolutionType.Feasible || Type == SolutionType.Optimal; } }
+		public bool Valid => Type == SolutionType.Unbounded || Type == SolutionType.Feasible || Type == SolutionType.Optimal;
 		/// The type of this solution.
 		public SolutionType Type;
 		/// A valid finite bound on the objective function,
@@ -621,7 +615,7 @@ namespace Plate.ModernSatsuma.LP
 		{
 			Type = SolutionType.Invalid;
 			SetBoundAndValueForType();
-			Primal = new Dictionary<Variable, double>();
+			Primal = new();
 		}
 
 		public Solution(Problem problem)

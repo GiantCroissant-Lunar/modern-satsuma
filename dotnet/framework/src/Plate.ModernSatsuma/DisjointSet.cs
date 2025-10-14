@@ -83,10 +83,10 @@ public sealed class DisjointSet<T> : IDisjointSet<T>
 
 	public DisjointSet()
 	{
-		parent = new Dictionary<T, T>();
-		next = new Dictionary<T, T>();
-		last = new Dictionary<T, T>();
-		tmpList = new List<T>();
+		parent = new();
+		next = new();
+		last = new();
+		tmpList = new();
 	}
 
 	public void Clear()

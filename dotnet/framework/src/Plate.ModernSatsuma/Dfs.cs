@@ -41,7 +41,7 @@ public abstract class Dfs
 			default: arcFilter = ArcFilter.Backward; break;
 		}
 
-		traversed = new HashSet<Node>();
+		traversed = new();
 		foreach (var node in (roots ?? Graph.Nodes()))
 		{
 			if (traversed.Contains(node)) continue;

@@ -17,7 +17,7 @@ public sealed class BipartiteMaximumMatching : IClearable
 	private readonly Matching matching;
 
 	/// The current matching.
-	public IMatching Matching { get { return matching; } }
+	public IMatching Matching => matching;
 
 	private readonly HashSet<Node> unmatchedRedNodes;
 
@@ -26,7 +26,7 @@ public sealed class BipartiteMaximumMatching : IClearable
 		Graph = graph;
 		IsRed = isRed;
 		matching = new Matching(Graph);
-		unmatchedRedNodes = new HashSet<Node>();
+		unmatchedRedNodes = new();
 
 		Clear();
 	}
@@ -48,7 +48,7 @@ public sealed class BipartiteMaximumMatching : IClearable
 	public int GreedyGrow(int maxImprovements = int.MaxValue)
 	{
 		int result = 0;
-		List<Node> matchedRedNodes = new List<Node>();
+		List<Node> matchedRedNodes = new();
 		foreach (var x in unmatchedRedNodes)
 				foreach (var arc in Graph.Arcs(x))
 				{
@@ -117,8 +117,8 @@ public sealed class BipartiteMaximumMatching : IClearable
 	/// \note Calling #GreedyGrow before #Run may speed up operation.
 	public void Run()
 	{
-		List<Node> matchedRedNodes = new List<Node>();
-		parentArc = new Dictionary<Node, Arc>();
+		List<Node> matchedRedNodes = new();
+		parentArc = new();
 		foreach (var x in unmatchedRedNodes)
 		{
 			parentArc.Clear();

@@ -20,9 +20,9 @@ public sealed class Subgraph : IGraph
 	private IGraph graph;
 
 	private bool defaultNodeEnabled;
-	private HashSet<Node> nodeExceptions = new HashSet<Node>();
+	private HashSet<Node> nodeExceptions = new();
 	private bool defaultArcEnabled;
-	private HashSet<Arc> arcExceptions = new HashSet<Arc>();
+	private HashSet<Arc> arcExceptions = new();
 
 	public Subgraph(IGraph graph)
 	{

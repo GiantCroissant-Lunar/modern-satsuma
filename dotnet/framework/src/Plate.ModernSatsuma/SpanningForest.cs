@@ -45,7 +45,7 @@ public sealed class Prim<TCost>
 	{
 		Graph = graph;
 		Cost = cost;
-		Forest = new HashSet<Arc>();
+		Forest = new();
 		ForestGraph = new Subgraph(graph);
 		ForestGraph.EnableAllArcs(false);
 
@@ -60,9 +60,9 @@ public sealed class Prim<TCost>
 	private void Run()
 	{
 		Forest.Clear();
-		PriorityQueue<Node, TCost> priorityQueue = new PriorityQueue<Node, TCost>();
-		HashSet<Node> processed = new HashSet<Node>();
-		Dictionary<Node, Arc> parentArc = new Dictionary<Node, Arc>();
+		PriorityQueue<Node, TCost> priorityQueue = new();
+		HashSet<Node> processed = new();
+		Dictionary<Node, Arc> parentArc = new();
 
 		// start with one point from each component
 		var components = new ConnectedComponents(Graph, ConnectedComponents.Flags.CreateComponents);
@@ -160,10 +160,10 @@ public sealed class Kruskal<TCost>
 		Cost = cost;
 		MaxDegree = maxDegree;
 
-		Forest = new HashSet<Arc>();
+		Forest = new();
 		ForestGraph = new Subgraph(graph);
 		ForestGraph.EnableAllArcs(false);
-		Degree = new Dictionary<Node, int>();
+		Degree = new();
 		foreach (var node in Graph.Nodes()) Degree[node] = 0;
 
 		List<Arc> arcs = Graph.Arcs().ToList();

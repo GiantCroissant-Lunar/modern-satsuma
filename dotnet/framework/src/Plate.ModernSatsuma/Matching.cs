@@ -40,8 +40,8 @@ public sealed class Matching : IMatching, IClearable
 	{
 		Graph = graph;
 
-		matchedArc = new Dictionary<Node, Arc>();
-		arcs = new HashSet<Arc>();
+		matchedArc = new();
+		arcs = new();
 
 		Clear();
 	}

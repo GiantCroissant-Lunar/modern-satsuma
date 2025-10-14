@@ -58,7 +58,7 @@ public sealed class Preflow : IFlow<double>
 		Source = source;
 		Target = target;
 
-		flow = new Dictionary<Arc, double>();
+		flow = new();
 
 		// calculate bottleneck capacity to get an upper bound for the flow value
 		Dijkstra dijkstra = new Dijkstra(Graph, a => -Capacity(a), DijkstraMode.Maximum);
@@ -164,10 +164,10 @@ public sealed class IntegerPreflow : IFlow<long>
 		Source = source;
 		Target = target;
 
-		flow = new Dictionary<Arc, long>();
-		excess = new Dictionary<Node, long>();
-		label = new Dictionary<Node, long>();
-		active = new PriorityQueue<Node, long>();
+		flow = new();
+		excess = new();
+		label = new();
+		active = new();
 
 		Run();
 

@@ -116,7 +116,7 @@ namespace Plate.ModernSatsuma;
 		var whitespace = new Regex(@"\s");
 
 		writer.WriteLine(Graph.NodeCount() + " " + Graph.ArcCount());
-		Dictionary<Node, long> index = new Dictionary<Node,long>();
+		Dictionary<Node, long> index = new();
 		long indexFactory = StartIndex;
 		foreach (var arc in Graph.Arcs())
 		{
@@ -173,7 +173,7 @@ public sealed class LemonGraphFormat
 	{
 		NodeMaps = new Dictionary<string, Dictionary<Node, string>>();
 		ArcMaps = new Dictionary<string, Dictionary<Arc, string>>();
-		Attributes = new Dictionary<string, string>();
+		Attributes = new();
 	}
 
 	private static string Escape(string s)
@@ -234,7 +234,7 @@ public sealed class LemonGraphFormat
 		buildableGraph.Clear();
 
 		NodeMaps.Clear();
-		var nodeFromLabel = new Dictionary<string,Node>();
+		var nodeFromLabel = new Dictionary<string, Node>();
 		ArcMaps.Clear();
 		Attributes.Clear();
 
@@ -284,7 +284,7 @@ public sealed class LemonGraphFormat
 								string column = columnNames[i];
 								if (column == "label") labelColumnIndex = i;
 								if (!NodeMaps.ContainsKey(column))
-									NodeMaps[column] = new Dictionary<Node, string>();
+									NodeMaps[column] = new();
 							}
 						}
 						else
@@ -306,7 +306,7 @@ public sealed class LemonGraphFormat
 							columnNames = tokens;
 							foreach (var column in columnNames)
 								if (!ArcMaps.ContainsKey(column))
-									ArcMaps[column] = new Dictionary<Arc, string>();
+									ArcMaps[column] = new();
 						}
 						else
 						{

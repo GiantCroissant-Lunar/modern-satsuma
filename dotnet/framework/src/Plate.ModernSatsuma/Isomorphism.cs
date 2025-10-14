@@ -55,15 +55,9 @@ public class Isomorphism
 			buffer = new Dictionary<Node, ulong>(graph.NodeCount());
 		}
 
-		public bool RegularGraph
-		{
-			get { return maxDegree == minDegree; }
-		}
+		public bool RegularGraph => maxDegree == minDegree;
 
-		public Dictionary<Node,ulong> Coloring
-		{
-			get { return coloring; }
-		}
+		public Dictionary<Node,ulong> Coloring => coloring;
 
 		/// Sorts the nodes by color and returns the result.
 		public List<KeyValuePair<Node,ulong>> GetSortedColoring()
@@ -73,10 +67,7 @@ public class Isomorphism
 			return result;
 		}
 
-		public ulong ColoringHash
-		{
-			get { return coloringHash; }
-		}
+		public ulong ColoringHash => coloringHash;
 
 		private void ComputeHash()
 		{

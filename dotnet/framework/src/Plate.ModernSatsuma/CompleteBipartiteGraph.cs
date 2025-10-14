@@ -48,22 +48,13 @@ public sealed class CompleteBipartiteGraph : IGraph
 	
 	/// Gets a red node by its index.
 	/// \param index An integer between 0 (inclusive) and RedNodeCount (exclusive).
-	public Node GetRedNode(int index)
-	{
-		return new Node(1L + index);
-	}
+	public Node GetRedNode(int index) => new Node(1L + index);
 
 	/// Gets a blue node by its index.
 	/// \param index An integer between 0 (inclusive) and BlueNodeCount (exclusive).
-	public Node GetBlueNode(int index)
-	{
-		return new Node(1L + RedNodeCount + index);
-	}
+	public Node GetBlueNode(int index) => new Node(1L + RedNodeCount + index);
 
-	public bool IsRed(Node node)
-	{
-		return node.Id <= RedNodeCount;
-	}
+	public bool IsRed(Node node) => node.Id <= RedNodeCount;
 
 	/// Gets the unique arc between two nodes.
 	/// \param u The first node.

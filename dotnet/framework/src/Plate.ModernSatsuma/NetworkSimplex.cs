@@ -111,15 +111,15 @@ public sealed class NetworkSimplex : IClearable
 
 	/// Returns those arcs which are saturated (the flow equals to the upper bound),
 	/// but are not in the basic forest.
-	public IEnumerable<Arc> UpperBoundArcs { get { return Saturated; } }
+	public IEnumerable<Arc> UpperBoundArcs => Saturated;
 	
 	/// Reverts the solver to its initial state.
 	public void Clear()
 	{
-		Dictionary<Node, long> excess = new Dictionary<Node, long>();
+		Dictionary<Node, long> excess = new();
 		foreach (var n in Graph.Nodes()) excess[n] = Supply(n);
 
-		Saturated = new HashSet<Arc>();
+		Saturated = new();
 		foreach (var arc in Graph.Arcs())
 		{
 			long f = LowerBound(arc);
@@ -130,11 +130,11 @@ public sealed class NetworkSimplex : IClearable
 			excess[Graph.V(arc)] += flow;
 		}
 
-		Potential = new Dictionary<Node, double>();
+		Potential = new();
 		MyGraph = new Supergraph(Graph);
 		ArtificialNode = MyGraph.AddNode();
 		Potential[ArtificialNode] = 0;
-		ArtificialArcs = new HashSet<Arc>();
+		ArtificialArcs = new();
 		var artificialArcOf = new Dictionary<Node, Arc>();
 		foreach (var n in Graph.Nodes())
 		{
@@ -146,7 +146,7 @@ public sealed class NetworkSimplex : IClearable
 			artificialArcOf[n] = arc;
 		}
 
-		Tree = new Dictionary<Arc, long>();
+		Tree = new();
 		TreeSubgraph = new Subgraph(MyGraph);
 		TreeSubgraph.EnableAllArcs(false);
 		foreach (var kv in artificialArcOf)
@@ -281,8 +281,8 @@ public sealed class NetworkSimplex : IClearable
 
 		// find the basic circle of the arc: this consists of forward and reverse arcs
 		Node u = MyGraph.U(enteringArc), v = MyGraph.V(enteringArc);
-		List<Arc> forwardArcs = new List<Arc>();
-		List<Arc> backwardArcs = new List<Arc>();
+		List<Arc> forwardArcs = new();
+		List<Arc> backwardArcs = new();
 		IPath pathu = TreeSubgraph.FindPath(v, u, Dfs.Direction.Undirected);
 		foreach (var n in pathu.Nodes())
 		{

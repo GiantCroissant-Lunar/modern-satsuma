@@ -106,7 +106,7 @@ namespace Plate.ModernSatsuma.LP
 			MinArcCount = 0;
 			MaxArcCount = int.MaxValue;
 			ArcCountWeight = 0;
-			CostFunctions = new List<CostFunction>();
+			CostFunctions = new();
 			SolutionType = SolutionType.Invalid;
 			ResultGraph = null;
 		}
@@ -234,7 +234,7 @@ namespace Plate.ModernSatsuma.LP
 		/// If SolutionType is Optimal, this Matching is an optimal matching.
 		/// If SolutionType is Feasible, Matching is valid but not optimal.
 		/// Otherwise, Matching is null.
-		public IMatching Matching { get { return matching; } }
+		public IMatching Matching => matching;
 
 		public LPMaximumMatching(ISolver solver, IGraph graph)
 		{
@@ -278,7 +278,7 @@ namespace Plate.ModernSatsuma.LP
 		/// If SolutionType is Optimal, this Matching is an optimal matching.
 		/// If SolutionType is Feasible, Matching is valid but not optimal.
 		/// Otherwise, Matching is null.
-		public IMatching Matching { get { return matching; } }
+		public IMatching Matching => matching;
 
 		public LPMinimumCostMatching(ISolver solver, IGraph graph, Func<Arc, double> cost,
 			int minimumMatchingSize = 0, int maximumMatchingSize = int.MaxValue)

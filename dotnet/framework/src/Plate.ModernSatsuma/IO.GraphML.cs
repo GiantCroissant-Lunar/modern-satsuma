@@ -129,7 +129,7 @@ namespace Plate.ModernSatsuma.IO
 		protected DictionaryProperty() : base()
 		{
 			HasDefaultValue = false;
-			Values = new Dictionary<object, T>();
+			Values = new();
 		}
 
 		/// Clears all values (including the default value) stored by the property.
@@ -606,7 +606,7 @@ namespace Plate.ModernSatsuma.IO
 			
 			// load properties
 			Properties.Clear();
-			Dictionary<string, GraphMLProperty> propertyById = new Dictionary<string, GraphMLProperty>();
+			Dictionary<string, GraphMLProperty> propertyById = new();
 			foreach (var xKey in Utils.ElementsLocal(xGraphML, "key"))
 			{
 				foreach (var handler in PropertyLoaders)
@@ -628,8 +628,8 @@ namespace Plate.ModernSatsuma.IO
 				Directedness.Directed : Directedness.Undirected);
 			ReadProperties(propertyById, xGraph, Graph);
 			// load nodes
-			NodeId = new Dictionary<Node, string>();
-			Dictionary<string, Node> nodeById = new Dictionary<string, Node>();
+			NodeId = new();
+			Dictionary<string, Node> nodeById = new();
 			foreach (var xNode in Utils.ElementsLocal(xGraph, "node"))
 			{
 				Node node = buildableGraph.AddNode();
@@ -639,7 +639,7 @@ namespace Plate.ModernSatsuma.IO
 				ReadProperties(propertyById, xNode, node);
 			}
 			// load arcs
-			ArcId = new Dictionary<Arc, string>();
+			ArcId = new();
 			foreach (var xArc in Utils.ElementsLocal(xGraph, "edge"))
 			{
 				Node u = nodeById[xArc.Attribute("source").Value];
@@ -744,9 +744,9 @@ namespace Plate.ModernSatsuma.IO
 			xml.WriteAttributeString("parse.order", "nodesfirst");
 			DefinePropertyValues(xml, Graph);
 
-			Dictionary<string, Node> nodeById = new Dictionary<string, Node>();
+			Dictionary<string, Node> nodeById = new();
 			if (NodeId == null)
-				NodeId = new Dictionary<Node,string>();
+				NodeId = new();
 			foreach (var kv in NodeId)
 			{
 				if (nodeById.ContainsKey(kv.Value))

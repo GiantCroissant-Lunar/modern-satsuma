@@ -49,8 +49,8 @@ public sealed class BellmanFord
 		Graph = graph;
 		Cost = cost;
 
-		distance = new Dictionary<Node, double>();
-		parentArc = new Dictionary<Node, Arc>();
+		distance = new();
+		parentArc = new();
 
 		foreach (var n in sources)
 		{
@@ -122,14 +122,11 @@ public sealed class BellmanFord
 	}
 
 	/// Returns whether a node has been reached.
-	public bool Reached(Node node)
-	{
-		return parentArc.ContainsKey(node);
-	}
+	public bool Reached(Node node) => parentArc.ContainsKey(node);
 
 	/// Returns the reached nodes.
 	/// \sa Reached
-	public IEnumerable<Node> ReachedNodes { get { return parentArc.Keys; } }
+	public IEnumerable<Node> ReachedNodes => parentArc.Keys;
 
 	/// Gets the cost of the cheapest path from the source nodes to a given node.
 	/// \return The distance, or <tt>double.PositiveInfinity</tt> if the node is unreachable from the source nodes.
@@ -169,5 +166,18 @@ public sealed class BellmanFord
 			node = Graph.Other(arc, node);
 		}
 		return result;
+	}
+
+	/// <summary>
+	/// Attempts to get a cheapest path from the source nodes to a given node.
+	/// </summary>
+	/// <param name="node">The target node.</param>
+	/// <param name="path">The path if the node is reachable, null otherwise.</param>
+	/// <returns>True if the node is reachable, false otherwise.</returns>
+	/// <exception cref="InvalidOperationException">A reachable negative cycle has been found.</exception>
+	public bool TryGetPath(Node node, out IPath? path)
+	{
+		path = GetPath(node);
+		return path != null;
 	}
 }

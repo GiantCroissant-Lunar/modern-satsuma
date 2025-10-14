@@ -124,9 +124,9 @@ public sealed class Path : IPath, IClearable
 	{
 		Graph = graph;
 
-		nextArc = new Dictionary<Node, Arc>();
-		prevArc = new Dictionary<Node, Arc>();
-		arcs = new HashSet<Arc>();
+		nextArc = new();
+		prevArc = new();
+		arcs = new();
 
 		Clear();
 	}
@@ -312,8 +312,8 @@ public sealed class PathGraph : IPath
 	private readonly int nodeCount;
 	private readonly bool isCycle, directed;
 
-	public Node FirstNode { get { return nodeCount > 0 ? new Node(1) : Node.Invalid; } }
-	public Node LastNode { get { return nodeCount > 0 ? new Node(isCycle ? 1 : nodeCount) : Node.Invalid; } }
+	public Node FirstNode => nodeCount > 0 ? new Node(1) : Node.Invalid;
+	public Node LastNode => nodeCount > 0 ? new Node(isCycle ? 1 : nodeCount) : Node.Invalid;
 
 	public enum Topology
 	{

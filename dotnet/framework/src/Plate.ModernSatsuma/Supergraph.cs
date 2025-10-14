@@ -74,10 +74,10 @@ public class Supergraph : IBuildableGraph, IDestroyableGraph, IGraph
 		nodeAllocator = new NodeAllocator() { Parent = this };
 		arcAllocator = new ArcAllocator() { Parent = this };
 
-		nodes = new HashSet<Node>();
-		arcs = new HashSet<Arc>();
-		arcProperties = new Dictionary<Arc, ArcProperties>();
-		edges = new HashSet<Arc>();
+		nodes = new();
+		arcs = new();
+		arcProperties = new();
+		edges = new();
 
 		nodeArcs_All = new Dictionary<Node, List<Arc>>();
 		nodeArcs_Edge = new Dictionary<Node, List<Arc>>();
@@ -236,7 +236,7 @@ public class Supergraph : IBuildableGraph, IDestroyableGraph, IGraph
 		return filter == ArcFilter.All ? arcs : edges;
 	}
 
-	private static readonly List<Arc> EmptyArcList = new List<Arc>();
+	private static readonly List<Arc> EmptyArcList = new();
 	private List<Arc> ArcsInternal(Node v, ArcFilter filter)
 	{
 		List<Arc> result;

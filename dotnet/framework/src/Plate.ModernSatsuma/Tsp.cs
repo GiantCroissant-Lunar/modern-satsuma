@@ -55,14 +55,14 @@ public sealed class CheapestLinkTsp<TNode> : ITsp<TNode>
 	public Func<TNode, TNode, double> Cost { get; private set; }
 
 	private List<TNode> tour;
-	public IEnumerable<TNode> Tour { get { return tour; } }
+	public IEnumerable<TNode> Tour => tour;
 	public double TourCost { get; private set; }
 
 	public CheapestLinkTsp(IList<TNode> nodes, Func<TNode, TNode, double> cost)
 	{
 		Nodes = nodes;
 		Cost = cost;
-		tour = new List<TNode>();
+		tour = new();
 
 		Run();
 	}
@@ -76,8 +76,8 @@ public sealed class CheapestLinkTsp<TNode> : ITsp<TNode>
 		Kruskal<double> kruskal = new Kruskal<double>(graph, arcCost, _ => 2);
 		kruskal.Run();
 
-		Dictionary<Node, Arc> firstArc = new Dictionary<Node, Arc>();
-		Dictionary<Node, Arc> secondArc = new Dictionary<Node, Arc>();
+		Dictionary<Node, Arc> firstArc = new();
+		Dictionary<Node, Arc> secondArc = new();
 		foreach (var arc in kruskal.Forest)
 		{
 			var u = graph.U(arc);
@@ -145,7 +145,7 @@ public sealed class InsertionTsp<TNode> : ITsp<TNode>
 	/// See ITsp&lt;TNode&gt;.Tour.
 	/// \note The current tour contains only a subset of the nodes in the middle of the execution of the algorithm, 
 	/// since the insertion TSP algorithm works by gradually extending a small tour.
-	public IEnumerable<TNode> Tour { get { return tour; } }
+	public IEnumerable<TNode> Tour => tour;
 	public double TourCost { get; private set; }
 
 	public InsertionTsp(IEnumerable<TNode> nodes, Func<TNode, TNode, double> cost,
@@ -157,8 +157,8 @@ public sealed class InsertionTsp<TNode> : ITsp<TNode>
 
 		tour = new LinkedList<TNode>();
 		tourNodes = new Dictionary<TNode,LinkedListNode<TNode>>();
-		insertableNodes = new HashSet<TNode>();
-		insertableNodeQueue = new PriorityQueue<TNode, double>();
+		insertableNodes = new();
+		insertableNodeQueue = new();
 
 		Clear();
 	}
@@ -260,7 +260,7 @@ public sealed class Opt2Tsp<TNode> : ITsp<TNode>
 
 	private List<TNode> tour;
 
-	public IEnumerable<TNode> Tour { get { return tour; } }
+	public IEnumerable<TNode> Tour => tour;
 	public double TourCost { get; private set; }
 
 	/// Initializes the 2-OPT optimizer with the supplied tour.

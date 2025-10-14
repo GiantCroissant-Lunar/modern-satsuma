@@ -115,4 +115,17 @@ public sealed class AStar
 		if (!dijkstra.Fixed(node)) return null;
 		return dijkstra.GetPath(node);
 	}
+
+	/// <summary>
+	/// Attempts to get a cheapest path from the source nodes to a given node.
+	/// </summary>
+	/// <param name="node">The target node.</param>
+	/// <param name="path">The path if the node has been reached, null otherwise.</param>
+	/// <returns>True if the node has been reached, false otherwise.</returns>
+	/// <exception cref="ArgumentException">Heuristic(node) is not 0.</exception>
+	public bool TryGetPath(Node node, out IPath? path)
+	{
+		path = GetPath(node);
+		return path != null;
+	}
 }
