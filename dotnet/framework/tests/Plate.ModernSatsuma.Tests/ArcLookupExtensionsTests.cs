@@ -28,7 +28,7 @@ namespace Plate.ModernSatsuma.Test
             var result = mockGraph.ArcToString(arc);
 
             // Assert
-            result.Should().Be("1<-->2");
+            result.Should().Be("#1<-->#2");
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace Plate.ModernSatsuma.Test
             var result = mockGraph.ArcToString(arc);
 
             // Assert
-            result.Should().Be("3--->4");
+            result.Should().Be("#3--->#4");
         }
 
         [Fact]
