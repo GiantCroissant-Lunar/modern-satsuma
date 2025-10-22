@@ -38,6 +38,14 @@ modern-satsuma/
 
 ### Build
 
+#### Using Nuke Build System (Recommended)
+```bash
+cd build/nuke
+.\build.cmd Pack    # Build and create NuGet package
+.\build.cmd --help  # Show available targets
+```
+
+#### Using .NET CLI Directly
 ```bash
 cd dotnet/framework
 dotnet build
@@ -49,6 +57,15 @@ dotnet build
 cd dotnet/framework
 dotnet test
 ```
+
+### NuGet Package Creation
+
+The project uses [Nuke](https://nuke.build/) with GitVersion for automated package creation:
+- **Packages Output**: `build/_artifacts/{version}/`
+- **Semantic Versioning**: Automatic version generation based on Git history
+- **Build Targets**: Clean, Restore, Compile, Pack, Publish
+
+See [Nuke Build Documentation](./docs/NUKE_BUILD_SETUP_COMPLETE.md) for complete setup details.
 
 ### Using the Library
 
@@ -75,9 +92,20 @@ if (dijkstra.Reached(node2))
 
 ## Documentation
 
-See the [docs](./docs/) folder for detailed documentation:
-- [Modernization Analysis](./docs/MODERNIZATION_ANALYSIS.md)
-- [Fix Action Plan](./docs/FIX_ACTION_PLAN.md)
+See the [docs](./docs/) folder for comprehensive documentation:
+
+### 📋 Quick Links
+- **[Documentation Index](./docs/README.md)** - Complete documentation overview
+- **[Project Status](./docs/status/)** - Current status and completion reports
+- **[Implementation Guides](./docs/guides/)** - Step-by-step guides and plans
+- **[Performance Guide](./docs/PERFORMANCE_GUIDE.md)** - API optimization guide
+- **[Nuke Build System](./docs/NUKE_BUILD_SETUP_COMPLETE.md)** - Complete build system setup and GitVersion integration
+- **[Documentation Organization Report](./docs/DOCUMENTATION_ORGANIZATION_COMPLETE.md)** - Complete documentation restructuring summary
+
+### 🚀 Getting Started
+- **New Users:** Start with [Project Status](./docs/status/README.md)
+- **Developers:** See [Implementation Guides](./docs/guides/README.md)
+- **Performance:** Read [Performance Guide](./docs/PERFORMANCE_GUIDE.md)
 
 ## Status
 
