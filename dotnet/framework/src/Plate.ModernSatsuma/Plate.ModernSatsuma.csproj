@@ -5,10 +5,26 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <!-- NuGet Package Metadata -->
     <PackageId>Plate.ModernSatsuma</PackageId>
-    <Version>1.0.0-alpha.1</Version>
+    <Title>Modern Satsuma Graph Library</Title>
     <Authors>Winged Bean Team</Authors>
-    <Description>Modernized Satsuma graph library for .NET Standard</Description>
+    <Company>Plate Framework</Company>
+    <Product>Plate.ModernSatsuma</Product>
+    <Description>A modernized version of the Satsuma Graph Library for .NET Standard 2.1+. Provides efficient implementations of graph algorithms, data structures, and utilities including path finding (Dijkstra, A*), network flow, matching algorithms, and graph transformations.</Description>
+    <Summary>Modernized Satsuma graph library with comprehensive graph algorithms and data structures for .NET</Summary>
+    <PackageTags>graph;algorithms;dijkstra;pathfinding;network;flow;matching;satsuma;modernized</PackageTags>
+    <PackageProjectUrl>https://github.com/plate-framework/modern-satsuma</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/plate-framework/modern-satsuma</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>Zlib</PackageLicenseExpression>
+    <Copyright>Copyright (c) 2024 Plate Framework Team. Original Satsuma library by Balázs Szalkai.</Copyright>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>See CHANGELOG.md for detailed release notes.</PackageReleaseNotes>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     
     <!-- Suppress internal nullable warnings until full RFC-002 implementation -->
     <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8625</NoWarn>
