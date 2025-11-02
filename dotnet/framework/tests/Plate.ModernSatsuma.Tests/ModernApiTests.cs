@@ -243,9 +243,9 @@ namespace Plate.ModernSatsuma.Test
             pathLength.Should().BeGreaterThan(0);
             pathLength.Should().BeLessOrEqualTo(pathBuffer.Length);
             
-            // Verify path starts with target and ends with source
-            pathBuffer[0].Should().Be(new Node(3));
-            pathBuffer[pathLength - 1].Should().Be(new Node(1));
+            // Verify path starts with source and ends with target (same as IPath.Nodes() enumeration)
+            pathBuffer[0].Should().Be(new Node(1));
+            pathBuffer[pathLength - 1].Should().Be(new Node(3));
         }
 
         [Fact]
