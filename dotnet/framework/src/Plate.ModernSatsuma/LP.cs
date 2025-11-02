@@ -349,6 +349,36 @@ namespace Plate.ModernSatsuma.LP
 		{
 			throw new InvalidOperationException("Not-equal LP constraints are not supported.");
 		}
+
+		/// <summary>
+		/// Note: This is required because == operator is overridden for constraint creation.
+		/// Use == operator to create constraints, not for equality comparison.
+		/// </summary>
+		public override bool Equals(object? obj)
+		{
+			if (obj is not Expression other) return false;
+			if (!Bias.Equals(other.Bias)) return false;
+			if (Coefficients.Count != other.Coefficients.Count) return false;
+			foreach (var kvp in Coefficients)
+			{
+				if (!other.Coefficients.TryGetValue(kvp.Key, out var value) || !kvp.Value.Equals(value))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>
+		/// Returns hash code for the expression.
+		/// </summary>
+		public override int GetHashCode()
+		{
+			var hash = Bias.GetHashCode();
+			foreach (var kvp in Coefficients)
+			{
+				hash ^= kvp.Key.GetHashCode() ^ kvp.Value.GetHashCode();
+			}
+			return hash;
+		}
 	}
 
 	/// A comparison operator (&lt;, &lt;=, &gt;, &gt;= or =).
