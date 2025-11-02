@@ -1,0 +1,17 @@
+        [Fact]
+        public void Draw_WithBoundingBox_ShouldNotThrow()
+        {
+            // Arrange
+            var graph = new CompleteGraph(4, Directedness.Undirected);
+            var factory = _surfaceFactory.GraphicsFactory;
+            var drawer = new GraphDrawer(graph, factory)
+            {
+                NodePosition = node => new Point2D(50 + graph.GetNodeIndex(node) * 30, 50)
+            };
+            var boundingBox = new Rectangle2D(0, 0, 300, 200);
+
+            // Act & Assert
+            using var surface = _surfaceFactory.CreateSurface(400, 400);
+            using var context = surface.GetGraphicsContext();
+            drawer.Invoking(d => d.Draw(context, boundingBox)).Should().NotThrow();
+        }
