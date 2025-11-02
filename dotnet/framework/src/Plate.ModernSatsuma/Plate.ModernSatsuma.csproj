@@ -27,7 +27,8 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     
     <!-- Suppress internal nullable warnings until full RFC-002 implementation -->
-    <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8625</NoWarn>
+    <!-- Suppress missing XML documentation warnings - inherited from original library -->
+    <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8625;CS1591</NoWarn>
   </PropertyGroup>
 
   <!-- Exclude Drawing.cs for .NET Standard 2.0 - System.Drawing is deprecated -->

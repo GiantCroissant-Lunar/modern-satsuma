@@ -517,14 +517,14 @@ namespace Plate.ModernSatsuma.IO
 	///                              {  343.93,    0,    5843.78 },
 	///                              { 5576.46, 5843.78,    0    } };
 	/// CompleteGraph g = new CompleteGraph(nodeNames.Length, Directedness.Undirected);
-	/// Kruskal<double> kruskal = new Kruskal<double>(g,
-	///		arc => distanceMatrix[g.GetNodeIndex(g.U(arc)), g.GetNodeIndex(g.V(arc))]);
+	/// Kruskal&lt;double&gt; kruskal = new Kruskal&lt;double&gt;(g,
+	///		arc =&gt; distanceMatrix[g.GetNodeIndex(g.U(arc)), g.GetNodeIndex(g.V(arc))]);
 	/// kruskal.Run();
 	/// GraphMLFormat gml = new GraphMLFormat();
 	/// gml.Graph = kruskal.ForestGraph;
-	/// gml.AddStandardNodeProperty("name", n => nodeNames[g.GetNodeIndex(n)]);
-	/// gml.AddStandardArcProperty("color", a => distanceMatrix[g.GetNodeIndex(g.U(a)), g.GetNodeIndex(g.V(a))] &lt; 1000 ? "#ff0000" : "#0000ff");
-	/// gml.AddStandardArcProperty("distance", a => distanceMatrix[g.GetNodeIndex(g.U(a)), g.GetNodeIndex(g.V(a))]);
+	/// gml.AddStandardNodeProperty("name", n =&gt; nodeNames[g.GetNodeIndex(n)]);
+	/// gml.AddStandardArcProperty("color", a =&gt; distanceMatrix[g.GetNodeIndex(g.U(a)), g.GetNodeIndex(g.V(a))] &lt; 1000 ? "#ff0000" : "#0000ff");
+	/// gml.AddStandardArcProperty("distance", a =&gt; distanceMatrix[g.GetNodeIndex(g.U(a)), g.GetNodeIndex(g.V(a))]);
 	/// gml.Save("tree_with_annotations.graphml");
 	/// \endcode
 	///
