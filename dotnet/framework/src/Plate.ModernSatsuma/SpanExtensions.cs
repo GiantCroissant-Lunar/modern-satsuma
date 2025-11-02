@@ -12,18 +12,18 @@ public static class SpanExtensions
 {
 	/// <summary>
 	/// Writes the path to the target node into the provided span without allocating.
+	/// The path is written from source to target.
 	/// </summary>
 	/// <param name="dijkstra">The Dijkstra instance.</param>
 	/// <param name="target">The target node.</param>
 	/// <param name="destination">Span to write the path into.</param>
-	/// <returns>The number of nodes written, or -1 if target is unreachable.</returns>
-	/// <exception cref="ArgumentException">Thrown if destination is too small.</exception>
+	/// <returns>The number of nodes written, 0 if target is unreachable, or negative if buffer is too small (actual required size is -returnValue).</returns>
 	public static int GetPathSpan(this Dijkstra dijkstra, Node target, Span<Node> destination)
 	{
 		if (dijkstra == null) throw new ArgumentNullException(nameof(dijkstra));
 		
 		if (!dijkstra.Reached(target))
-			return -1;
+			return 0;
 		
 		// First pass: count nodes in path
 		int count = 0;
@@ -36,18 +36,21 @@ public static class SpanExtensions
 			current = dijkstra.Graph.Other(arc, current);
 		}
 		
+		// Check if destination is too small
 		if (count > destination.Length)
-			throw new ArgumentException($"Destination span too small. Required: {count}, Available: {destination.Length}", nameof(destination));
+			return -count; // Return negative count to indicate required size
 		
-		// Second pass: write nodes to span (in reverse order)
+		// Second pass: write nodes to span from source to target
+		// Build the path backwards first, then reverse it
 		current = target;
-		int index = count - 1;
-		while (current != Node.Invalid && index >= 0)
+		int index = 0;
+		while (current != Node.Invalid && index < count)
 		{
-			destination[index--] = current;
+			destination[count - 1 - index] = current; // Write in reverse position
 			var arc = dijkstra.GetParentArc(current);
 			if (arc == Arc.Invalid) break;
 			current = dijkstra.Graph.Other(arc, current);
+			index++;
 		}
 		
 		return count;
@@ -55,18 +58,18 @@ public static class SpanExtensions
 	
 	/// <summary>
 	/// Writes the path arcs to the target node into the provided span without allocating.
+	/// The arcs are written from source to target.
 	/// </summary>
 	/// <param name="dijkstra">The Dijkstra instance.</param>
 	/// <param name="target">The target node.</param>
 	/// <param name="destination">Span to write the arcs into.</param>
-	/// <returns>The number of arcs written, or -1 if target is unreachable.</returns>
-	/// <exception cref="ArgumentException">Thrown if destination is too small.</exception>
+	/// <returns>The number of arcs written, 0 if target is unreachable, or negative if buffer is too small (actual required size is -returnValue).</returns>
 	public static int GetPathArcsSpan(this Dijkstra dijkstra, Node target, Span<Arc> destination)
 	{
 		if (dijkstra == null) throw new ArgumentNullException(nameof(dijkstra));
 		
 		if (!dijkstra.Reached(target))
-			return -1;
+			return 0;
 		
 		// Count arcs in path
 		int count = 0;
@@ -79,18 +82,20 @@ public static class SpanExtensions
 			current = dijkstra.Graph.Other(arc, current);
 		}
 		
+		// Check if destination is too small
 		if (count > destination.Length)
-			throw new ArgumentException($"Destination span too small. Required: {count}, Available: {destination.Length}", nameof(destination));
+			return -count; // Return negative count to indicate required size
 		
-		// Write arcs to span (in reverse order)
+		// Write arcs to span from source to target
 		current = target;
-		int index = count - 1;
-		while (current != Node.Invalid && index >= 0)
+		int index = 0;
+		while (current != Node.Invalid && index < count)
 		{
 			var arc = dijkstra.GetParentArc(current);
 			if (arc == Arc.Invalid) break;
-			destination[index--] = arc;
+			destination[count - 1 - index] = arc; // Write in reverse position
 			current = dijkstra.Graph.Other(arc, current);
+			index++;
 		}
 		
 		return count;
@@ -98,18 +103,18 @@ public static class SpanExtensions
 	
 	/// <summary>
 	/// Writes the path to the target node into the provided span without allocating.
+	/// The path is written from source to target.
 	/// </summary>
 	/// <param name="bellmanFord">The BellmanFord instance.</param>
 	/// <param name="target">The target node.</param>
 	/// <param name="destination">Span to write the path into.</param>
-	/// <returns>The number of nodes written, or -1 if target is unreachable.</returns>
-	/// <exception cref="ArgumentException">Thrown if destination is too small.</exception>
+	/// <returns>The number of nodes written, 0 if target is unreachable, or negative if buffer is too small (actual required size is -returnValue).</returns>
 	public static int GetPathSpan(this BellmanFord bellmanFord, Node target, Span<Node> destination)
 	{
 		if (bellmanFord == null) throw new ArgumentNullException(nameof(bellmanFord));
 		
 		if (!bellmanFord.Reached(target))
-			return -1;
+			return 0;
 		
 		// First pass: count nodes
 		int count = 0;
@@ -122,18 +127,20 @@ public static class SpanExtensions
 			current = bellmanFord.Graph.Other(arc, current);
 		}
 		
+		// Check if destination is too small
 		if (count > destination.Length)
-			throw new ArgumentException($"Destination span too small. Required: {count}, Available: {destination.Length}", nameof(destination));
+			return -count; // Return negative count to indicate required size
 		
-		// Second pass: write nodes
+		// Second pass: write nodes from source to target
 		current = target;
-		int index = count - 1;
-		while (current != Node.Invalid && index >= 0)
+		int index = 0;
+		while (current != Node.Invalid && index < count)
 		{
-			destination[index--] = current;
+			destination[count - 1 - index] = current; // Write in reverse position
 			var arc = bellmanFord.GetParentArc(current);
 			if (arc == Arc.Invalid) break;
 			current = bellmanFord.Graph.Other(arc, current);
+			index++;
 		}
 		
 		return count;

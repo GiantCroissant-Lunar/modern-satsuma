@@ -78,14 +78,14 @@ namespace Plate.ModernSatsuma.Test
             var dijkstra = new Dijkstra(graph, GetEdgeWeight, DijkstraMode.Sum);
             
             // Act
-            dijkstra.AddSource(new Node(1)); // Distance 5 to target
-            dijkstra.AddSource(new Node(2)); // Distance 2 to target
+            dijkstra.AddSource(new Node(1)); // Arc 1 (node1->node3) has weight 2.0
+            dijkstra.AddSource(new Node(2)); // Arc 2 (node2->node3) has weight 1.0
             dijkstra.Run();
             
             // Assert
             var target = new Node(3);
             dijkstra.Reached(target).Should().BeTrue();
-            dijkstra.GetDistance(target).Should().Be(2.0); // Should use shorter path from node 2
+            dijkstra.GetDistance(target).Should().Be(1.0); // Should use shorter path from node 2 with weight 1.0
         }
 
         [Fact]
@@ -236,8 +236,8 @@ namespace Plate.ModernSatsuma.Test
             var node3 = graph.AddNode(); // Node(3)
             
             // Create two paths to node 3:
-            // 1 --(5)--> 3 (longer)
-            // 2 --(2)--> 3 (shorter)
+            // 1 --(2.0)--> 3 (arc 1, longer)
+            // 2 --(1.0)--> 3 (arc 2, shorter)
             graph.AddArc(node1, node3, Directedness.Directed);
             graph.AddArc(node2, node3, Directedness.Directed);
             
