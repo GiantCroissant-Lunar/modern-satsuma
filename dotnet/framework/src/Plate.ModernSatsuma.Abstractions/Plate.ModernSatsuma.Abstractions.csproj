@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <!-- NuGet Package Metadata -->
+    <PackageId>Plate.ModernSatsuma.Abstractions</PackageId>
+    <Title>Modern Satsuma Graph Drawing Abstractions</Title>
+    <Authors>Winged Bean Team</Authors>
+    <Company>Plate Framework</Company>
+    <Product>Plate.ModernSatsuma.Abstractions</Product>
+    <Description>Drawing abstractions for Plate.ModernSatsuma graph library. Provides platform-agnostic interfaces for graph visualization that can be implemented by different rendering engines (System.Drawing, SkiaSharp, ImageSharp, etc.).</Description>
+    <Summary>Platform-agnostic drawing abstractions for Modern Satsuma graph visualization</Summary>
+    <PackageTags>graph;drawing;visualization;abstraction;cross-platform;satsuma</PackageTags>
+    <PackageProjectUrl>https://github.com/plate-framework/modern-satsuma</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/plate-framework/modern-satsuma</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>Zlib</PackageLicenseExpression>
+    <Copyright>Copyright (c) 2024 Plate Framework Team</Copyright>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    
+    <!-- Suppress missing XML documentation warnings -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plate.ModernSatsuma\Plate.ModernSatsuma.csproj" />
+  </ItemGroup>
+
+</Project>

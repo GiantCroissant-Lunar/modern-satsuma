@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <!-- NuGet Package Metadata -->
+    <PackageId>Plate.ModernSatsuma.Drawing.SkiaSharp</PackageId>
+    <Title>Modern Satsuma SkiaSharp Implementation</Title>
+    <Authors>Winged Bean Team</Authors>
+    <Company>Plate Framework</Company>
+    <Product>Plate.ModernSatsuma.Drawing.SkiaSharp</Product>
+    <Description>SkiaSharp-based implementation of Plate.ModernSatsuma drawing abstractions. Provides truly cross-platform graph visualization using hardware-accelerated 2D graphics. Works on Windows, Linux, macOS, iOS, Android, and WebAssembly.</Description>
+    <Summary>SkiaSharp implementation for Modern Satsuma graph drawing (truly cross-platform)</Summary>
+    <PackageTags>graph;drawing;visualization;skiasharp;cross-platform;satsuma;hardware-accelerated</PackageTags>
+    <PackageProjectUrl>https://github.com/plate-framework/modern-satsuma</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/plate-framework/modern-satsuma</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>Zlib</PackageLicenseExpression>
+    <Copyright>Copyright (c) 2024 Plate Framework Team</Copyright>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    
+    <!-- Suppress missing XML documentation warnings -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Plate.ModernSatsuma.Abstractions\Plate.ModernSatsuma.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

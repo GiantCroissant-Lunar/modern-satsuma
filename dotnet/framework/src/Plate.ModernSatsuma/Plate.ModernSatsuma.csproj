@@ -31,10 +31,15 @@
     <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8625;CS1591</NoWarn>
   </PropertyGroup>
 
-  <!-- Exclude Drawing.cs for .NET Standard 2.0 - System.Drawing is deprecated -->
+  <!-- Drawing.cs and Layout.cs have been extracted to separate packages:
+       - Plate.ModernSatsuma.Abstractions: Platform-agnostic drawing interfaces
+       - Plate.ModernSatsuma.Drawing.SystemDrawing: System.Drawing implementation
+       Layout functionality moved to GraphLayout.cs in this package -->
   <ItemGroup>
     <Compile Remove="Drawing.cs" />
+    <Compile Remove="Layout.cs" />
     <None Include="Drawing.cs" />
+    <None Include="Layout.cs" />
   </ItemGroup>
 
 </Project>
