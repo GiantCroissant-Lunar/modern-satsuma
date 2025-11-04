@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <PackageId>TestSatellite</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Title>Test Satellite Project</Title>
+    <Description>A test satellite project for verifying the build system</Description>
+    <Authors>Test Author</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+</Project>
