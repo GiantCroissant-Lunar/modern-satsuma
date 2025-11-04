@@ -53,3 +53,8 @@ Thumbs.db
 # Local config
 *.local.*
 .env
+
+# Hub sync (added by task hub:sync)
+.hub-cache/
+.agent
+.agent/

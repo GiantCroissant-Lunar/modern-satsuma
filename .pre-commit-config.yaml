@@ -1,99 +1,116 @@
-# Pre-commit configuration for modern-satsuma
-# See https://pre-commit.com for more information
+# Pre-commit hooks for lunar-snake-hub
+# Dogfooding: Hub uses its own pre-commit infrastructure
 
 repos:
-  # Basic file hygiene and common checks
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
-    hooks:
-      - id: trailing-whitespace
-        exclude: |
-          (?x)^(
-            dotnet/.*/bin/.*|
-            dotnet/.*/obj/.*|
-            dotnet/.*\.(cs|vb|fs)|
-            .*\.md
-          )$
-      - id: end-of-file-fixer
-        exclude: ^(dotnet/.*/bin/.*|dotnet/.*/obj/.*)$
-      - id: check-json
-        exclude: ^(dotnet/.*/bin/.*|dotnet/.*/obj/.*)$
-      - id: check-xml
-        exclude: ^(dotnet/.*/bin/.*|dotnet/.*/obj/.*)$
-      - id: check-yaml
-      - id: check-merge-conflict
-      - id: check-case-conflict
-      - id: mixed-line-ending
-        args: [--fix=lf]
-      - id: check-added-large-files
-        args: ['--maxkb=1000']
-        exclude: ^(dotnet/.*/bin/.*|dotnet/.*/obj/.*)$
-      - id: detect-private-key
+  # === Basic File Checks ===
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v6.0.0
+  hooks:
+  - id: trailing-whitespace
+    name: Remove trailing whitespace
+    args: [--markdown-linebreak-ext=md]
+  - id: end-of-file-fixer
+    name: Ensure files end with newline
+  - id: check-yaml
+    name: Validate YAML syntax
+  - id: check-json
+    name: Validate JSON syntax
+  - id: check-toml
+    name: Validate TOML syntax
+  - id: check-added-large-files
+    name: Prevent large files (>500KB)
+    args: [--maxkb=500]
+  - id: check-merge-conflict
+    name: Detect merge conflict markers
+  - id: detect-private-key
+    name: Prevent committing private keys
+  - id: check-case-conflict
+    name: Check for case-sensitive filename conflicts
+  - id: mixed-line-ending
+    name: Check for mixed line endings
+    args: [--fix=lf]
 
-  # Secret detection (GitLeaks)
-  - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.28.0
-    hooks:
-      - id: gitleaks
+  # === Markdown Linting ===
+- repo: https://github.com/igorshubovych/markdownlint-cli
+  rev: v0.45.0
+  hooks:
+  - id: markdownlint
+    name: Lint Markdown files
+    args: [--fix]
+    exclude: ^(\.hub-cache/|node_modules/)
 
-  # Python linting and formatting (for build scripts)
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.2
-    hooks:
-      - id: ruff-check
-        args: [--fix, --exit-non-zero-on-fix]
-        files: ^scripts/.*\.py$
-      - id: ruff-format
-        files: ^scripts/.*\.py$
+  # === YAML Formatting ===
+- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  rev: v2.15.0
+  hooks:
+  - id: pretty-format-yaml
+    name: Format YAML files
+    args: [--autofix, --indent, '2']
+    exclude: ^(\.hub-cache/|Taskfile\.yml$|\.markdownlintrc$)
 
-  # YAML linting
-  - repo: https://github.com/adrienverge/yamllint
-    rev: v1.37.1
-    hooks:
-      - id: yamllint
-        args: [-d, relaxed]
-        files: \.(yaml|yml)$
+  # === Python (if we add Python scripts) ===
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.14.3
+  hooks:
+  - id: ruff
+    name: Lint Python with Ruff
+    args: [--fix, --exit-non-zero-on-fix]
+  - id: ruff-format
+    name: Format Python with Ruff
 
-  # Markdown linting
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.45.0
-    hooks:
-      - id: markdownlint
-        args: ['--fix', '--disable', 'MD013']
+  # === Security Checks ===
+- repo: https://github.com/Yelp/detect-secrets
+  rev: v1.5.0
+  hooks:
+  - id: detect-secrets
+    name: Detect secrets in code
+    args: [--baseline, .secrets.baseline]
+    exclude: ^(\.sops\.yaml|infra/secrets/.*\.enc\.json|infra/secrets/.*\.template\.json|docs/.*|infra/SETUP\.md|infra/README\.md|infra/secrets/scripts/.*|infra/secrets/README\.md)$
 
-  # Hook Validator - .NET specific validation and formatting
-  - repo: local
-    hooks:
-      # Auto-format C# code with dotnet format
-      - id: format-dotnet
-        name: Format C# code with dotnet format
-        entry: python3 ../hook-validator/python/src/validators/dotnet/format_code.py
-        language: system
-        files: \.cs$
-        pass_filenames: true
+  # === Conventional Commits ===
+- repo: https://github.com/compilerla/conventional-pre-commit
+  rev: v4.3.0
+  hooks:
+  - id: conventional-pre-commit
+    name: Validate conventional commit message
+    stages: [commit-msg]
+    args: [feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert]
 
-      # Check for debug statements
-      - id: check-debug-statements
-        name: Check for Debug Statements
-        entry: bash -c 'if grep -rn "Debugger.Break" --include="*.cs" "$@"; then echo "Debug statements found!"; exit 1; fi'
-        language: system
-        files: \.cs$
-        exclude: '(Tests?/|/obj/|/bin/)'
+  # === Custom Hooks (local) ===
+- repo: local
+  hooks:
+  - id: check-sops-security
+    name: Check SOPS age key security
+    entry: ./precommit/checks/check-sops-security.sh
+    language: system
+    pass_filenames: false
+    always_run: true
+    stages: [pre-commit]
+  - id: validate-hub-structure
+    name: Validate hub repository structure
+    entry: bash -c 'task validate:structure || exit 0'
+    language: system
+    pass_filenames: false
+    stages: [pre-push]
 
-# Configuration
-default_stages: [pre-commit]
-fail_fast: false
-minimum_pre_commit_version: 3.0.0
+# === Configuration ===
+default_language_version:
+  python: python3
 
-# Global exclusions
+# Exclude patterns (global)
 exclude: |
   (?x)^(
-    .*\.min\..*|
-    .*\.generated\..*|
-    .*/obj/.*|
-    .*/bin/.*|
-    .*/node_modules/.*|
-    .*\.Designer\.cs|
-    .*\.g\.cs|
-    .*\.g\.i\.cs
+    \.hub-cache/.*|
+    \.git/.*|
+    node_modules/.*|
+    \.venv/.*|
+    venv/.*|
+    .*\.min\.(js|css)$
   )$
+
+# CI configuration
+ci:
+  autofix_commit_msg: 'style: auto-fix pre-commit hooks'
+  autofix_prs: true
+  autoupdate_commit_msg: 'chore: update pre-commit hooks'
+  autoupdate_schedule: weekly
