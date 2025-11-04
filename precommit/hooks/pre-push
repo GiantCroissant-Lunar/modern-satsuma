@@ -1,0 +1,18 @@
+#!/bin/bash
+# Custom pre-push hook
+# Runs before pushing to remote
+
+set -e
+
+echo "Running custom pre-push checks..."
+
+# Example: Run tests before push
+# npm test || exit 1
+
+# Example: Check for sensitive data
+if git diff --name-only origin/main..HEAD | xargs grep -nE "(password|secret|api[_-]?key)" 2>/dev/null; then
+    echo "Error: Potential sensitive data found"
+    exit 1
+fi
+
+echo "✓ Custom pre-push checks passed"

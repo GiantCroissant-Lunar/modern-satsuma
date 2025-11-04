@@ -1,0 +1,49 @@
+#!/bin/bash
+# Validate .hub-manifest.json against JSON schema
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../../utils/common.sh"
+
+MANIFEST=".hub-manifest.json"
+SCHEMA="schemas/hub-manifest.schema.json"
+
+# Check if manifest exists
+if [ ! -f "$MANIFEST" ]; then
+  exit 0  # Not an error if manifest doesn't exist
+fi
+
+log_info "Validating $MANIFEST..."
+
+# Validate JSON syntax
+if ! jq empty "$MANIFEST" 2>/dev/null; then
+  log_error "Invalid JSON syntax in $MANIFEST"
+  exit 1
+fi
+
+log_success "JSON syntax is valid"
+
+# Check if schema exists
+if [ ! -f "$SCHEMA" ]; then
+  log_warning "Schema file not found: $SCHEMA (skipping schema validation)"
+  exit 0
+fi
+
+# Validate against schema (requires ajv-cli: npm install -g ajv-cli)
+if command -v ajv &> /dev/null; then
+  if ajv validate -s "$SCHEMA" -d "$MANIFEST" --strict=false 2>/dev/null; then
+    log_success "$MANIFEST conforms to schema"
+  else
+    log_error "$MANIFEST does not conform to schema"
+    echo ""
+    echo "Run this command for details:"
+    echo "  ajv validate -s $SCHEMA -d $MANIFEST"
+    exit 1
+  fi
+else
+  log_warning "ajv-cli not installed (npm install -g ajv-cli) - skipping schema validation"
+  echo "  Install: npm install -g ajv-cli"
+fi
+
+exit 0

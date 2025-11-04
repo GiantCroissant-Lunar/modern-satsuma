@@ -1,0 +1,1293 @@
+version: '3'
+
+# lunar-snake-hub Taskfile
+# Dogfooding: Hub uses its own infrastructure
+
+vars:
+  HUB_CACHE: .hub-cache
+  HUB_REPO: https://github.com/GiantCroissant-Lunar/lunar-snake-hub
+  AGENT_SYMLINK: .agent
+
+tasks:
+  # === Hub Sync Tasks (Dogfooding) ===
+
+  hub:sync:
+    desc: Sync from hub (dogfooding test - syncs from self)
+    cmds:
+    - task: hub:clone
+    - task: hub:copy
+    - task: hub:symlink
+    - task: hub:update-gitignore
+    - echo "✅ Hub sync complete (dogfooding mode)"
+
+  hub:clone:
+    desc: Clone or update hub repo in cache
+    internal: true
+    cmds:
+    - |
+      if [ ! -d {{.HUB_CACHE}}/hub-repo ]; then
+        echo "📦 Cloning hub repo..."
+        git clone {{.HUB_REPO}} {{.HUB_CACHE}}/hub-repo
+      else
+        echo "🔄 Updating hub repo..."
+        git -C {{.HUB_CACHE}}/hub-repo pull
+      fi
+    status:
+    - test -d {{.HUB_CACHE}}/hub-repo/.git
+
+  hub:copy:
+    desc: Copy hub assets to cache
+    internal: true
+    deps: ['hub:clone']
+    cmds:
+    - mkdir -p {{.HUB_CACHE}}
+    - cp -r {{.HUB_CACHE}}/hub-repo/agents {{.HUB_CACHE}}/
+    - cp -r {{.HUB_CACHE}}/hub-repo/precommit {{.HUB_CACHE}}/
+    - |
+      if [ -d {{.HUB_CACHE}}/hub-repo/build/nuke ]; then
+        mkdir -p {{.HUB_CACHE}}/nuke
+        cp -r {{.HUB_CACHE}}/hub-repo/build/nuke/* {{.HUB_CACHE}}/nuke/ 2>/dev/null || true
+        echo "✅ Copied nuke ({{.HUB_CACHE}}/nuke/)"
+      fi
+    - echo "✅ Copied agents ({{.HUB_CACHE}}/agents/)"
+    - echo "✅ Copied precommit ({{.HUB_CACHE}}/precommit/)"
+
+  hub:symlink:
+    desc: Create .agent symlink to agents/
+    internal: true
+    cmds:
+    - |
+      if [ -L {{.AGENT_SYMLINK}} ] || [ -e {{.AGENT_SYMLINK}} ]; then
+        echo "ℹ️  {{.AGENT_SYMLINK}} already exists, skipping"
+      else
+        echo "🔗 Creating {{.AGENT_SYMLINK}} -> agents/"
+        # Try Unix symlink first, fall back to Windows junction
+        ln -s agents {{.AGENT_SYMLINK}} 2>/dev/null || \
+          cmd /c "mklink /J {{.AGENT_SYMLINK}} agents" || \
+          echo "⚠️  Failed to create symlink, agents/ still accessible"
+      fi
+
+  hub:update-gitignore:
+    desc: Ensure .gitignore has hub-related entries
+    internal: true
+    cmds:
+    - |
+      GITIGNORE=".gitignore"
+
+      # Entries that should be in .gitignore
+      REQUIRED_ENTRIES=(
+        ".hub-cache/"
+        ".agent"
+        ".agent/"
+      )
+
+      # Check if .gitignore exists
+      if [ ! -f "$GITIGNORE" ]; then
+        echo "⚠️  No .gitignore found, creating one"
+        touch "$GITIGNORE"
+      fi
+
+      # Check and add missing entries
+      UPDATED=false
+      for entry in "${REQUIRED_ENTRIES[@]}"; do
+        if ! grep -q "^${entry}$" "$GITIGNORE" 2>/dev/null; then
+          if [ "$UPDATED" = false ]; then
+            echo "" >> "$GITIGNORE"
+            echo "# Hub sync (added by task hub:sync)" >> "$GITIGNORE"
+            UPDATED=true
+          fi
+          echo "$entry" >> "$GITIGNORE"
+          echo "✅ Added to .gitignore: $entry"
+        fi
+      done
+
+      if [ "$UPDATED" = false ]; then
+        echo "ℹ️  .gitignore already has all hub entries"
+      fi
+
+  hub:check:
+    desc: Verify hub cache is up to date
+    cmds:
+    - |
+      echo "📊 Hub Cache Status:"
+      if [ -d {{.HUB_CACHE}}/agents ]; then
+        AGENT_COUNT=$(find {{.HUB_CACHE}}/agents -type f -name "*.md" | wc -l)
+        echo "  ✅ Agents: $AGENT_COUNT files"
+      else
+        echo "  ❌ Agents: Not synced"
+      fi
+      if [ -d {{.HUB_CACHE}}/precommit ]; then
+        echo "  ✅ Precommit: synced"
+      else
+        echo "  ❌ Precommit: Not synced"
+      fi
+      if [ -L {{.AGENT_SYMLINK}} ]; then
+        echo "  ✅ Symlink: {{.AGENT_SYMLINK}} -> agents/"
+      else
+        echo "  ⚠️  Symlink: Not created"
+      fi
+
+  hub:clean:
+    desc: Clean hub cache
+    cmds:
+    - rm -rf {{.HUB_CACHE}}
+    - echo "✅ Hub cache cleaned"
+
+  # === Pre-commit Hook Setup ===
+
+  precommit:setup:
+    desc: Install pre-commit hooks from hub cache
+    deps: ['hub:sync']
+    cmds:
+    - |
+      echo "🪝 Setting up pre-commit hooks..."
+
+      # Check if we're in a git repository
+      if ! git rev-parse --git-dir >/dev/null 2>&1; then
+        echo "❌ Error: Not in a git repository"
+        exit 1
+      fi
+
+      # Check if hub cache has precommit files
+      if [ ! -d {{.HUB_CACHE}}/precommit ]; then
+        echo "❌ Error: Pre-commit files not found in hub cache"
+        echo "   Run 'task hub:sync' first"
+        exit 1
+      fi
+
+      # Create git-hooks directory structure
+      mkdir -p git-hooks/checks git-hooks/utils
+
+      # Copy hooks and utilities from hub cache
+      echo "📋 Copying hooks from hub cache..."
+      cp -r {{.HUB_CACHE}}/precommit/hooks/* git-hooks/ 2>/dev/null || echo "  ⚠️  No hook scripts found"
+      cp -r {{.HUB_CACHE}}/precommit/checks/general git-hooks/checks/ 2>/dev/null || echo "  ⚠️  No general checks found"
+      cp -r {{.HUB_CACHE}}/precommit/utils/* git-hooks/utils/ 2>/dev/null || echo "  ⚠️  No utilities found"
+
+      # Make scripts executable
+      echo "🔧 Making scripts executable..."
+      find git-hooks -type f \( -name "*.sh" -o -name "*-check" -o -name "pre-*" -o -name "commit-*" \) -exec chmod +x {} \; 2>/dev/null || true
+
+      # Install hooks to .git/hooks
+      echo "📌 Installing hooks to .git/hooks..."
+      for hook in pre-commit commit-msg pre-push; do
+        if [ -f "git-hooks/$hook" ]; then
+          cp "git-hooks/$hook" ".git/hooks/$hook"
+          chmod +x ".git/hooks/$hook"
+          echo "  ✅ Installed: $hook"
+        fi
+      done
+
+      echo ""
+      echo "✅ Pre-commit hooks installed successfully!"
+      echo ""
+      echo "📝 Next steps:"
+      echo "  1. Install gitleaks: brew install gitleaks (macOS) or winget install gitleaks (Windows)"
+      echo "  2. Add language-specific checks to git-hooks/checks/ if needed"
+      echo "  3. Test with: git commit (hooks will run automatically)"
+      echo ""
+      echo "📚 See {{.HUB_CACHE}}/precommit/README.md for more info"
+
+  precommit:uninstall:
+    desc: Remove installed pre-commit hooks
+    cmds:
+    - |
+      echo "🗑️  Removing pre-commit hooks..."
+      rm -f .git/hooks/pre-commit
+      rm -f .git/hooks/commit-msg
+      rm -f .git/hooks/pre-push
+      rm -rf git-hooks/
+      echo "✅ Pre-commit hooks removed"
+
+  # === Infrastructure Tasks (Mac Mini) ===
+
+  infra:setup:
+    desc: Generate .env from encrypted secrets
+    dir: infra/secrets
+    cmds:
+    - |
+      echo "📋 Generating .env from config.json + secrets.enc.json..."
+      if [ "$(uname)" = "Darwin" ]; then
+        # Mac Mini: .sops.yaml automatically uses project key at .sops/age.key
+        cd ../../
+        sops decrypt infra/secrets/secrets.enc.json > /tmp/secrets.json
+        # Merge config + secrets -> .env
+        echo "OPENAI_API_KEY=$(jq -r '.GLM.ApiKey' /tmp/secrets.json)" > infra/docker/.env
+        echo "OPENAI_BASE_URL=$(jq -r '.GLM.BaseURL' infra/secrets/config.json)" >> infra/docker/.env
+        echo "GATEWAY_TOKEN=$(jq -r '.Services.Gateway.Token' /tmp/secrets.json)" >> infra/docker/.env
+        echo "N8N_USER=$(jq -r '.Services.N8n.User' infra/secrets/config.json)" >> infra/docker/.env
+        echo "N8N_PASSWORD=$(jq -r '.Services.N8n.Password' /tmp/secrets.json)" >> infra/docker/.env
+        rm /tmp/secrets.json
+      else
+        # Windows: use PowerShell script (.sops.yaml handles project key automatically)
+        pwsh -File json-to-env.ps1 -Encrypted
+      fi
+      echo "✅ .env generated!"
+
+  infra:start:
+    desc: Start all Docker services
+    dir: infra/docker
+    deps:
+      - infra:check-env
+    cmds:
+    - |
+      echo "🐳 Starting Docker services..."
+      docker compose up -d
+      echo "✅ Services started!"
+      echo ""
+      echo "🔗 Access via Tailscale:"
+      echo "  - Letta: http://juis-mac-mini:5055/v1/health"
+      echo "  - Qdrant: http://juis-mac-mini:6333"
+      echo "  - n8n: http://juis-mac-mini:5678"
+      echo "  - Gateway: http://juis-mac-mini:5057 (Phase 2)"
+
+  infra:stop:
+    desc: Stop all Docker services
+    dir: infra/docker
+    cmds:
+    - |
+      echo "🛑 Stopping Docker services..."
+      docker compose down
+      echo "✅ Services stopped!"
+
+  infra:restart:
+    desc: Restart all Docker services
+    cmds:
+    - task: infra:stop
+    - task: infra:start
+
+  infra:status:
+    desc: Check status of all services
+    dir: infra/docker
+    cmds:
+    - |
+      echo "📊 Service Status:"
+      docker compose ps
+      echo ""
+      echo "🏥 Health Checks:"
+      echo ""
+      echo -n "Letta (5055): "
+      curl -s -f http://localhost:5055/v1/health > /dev/null && echo "✅ Healthy" || echo "❌ Not responding"
+      echo -n "Qdrant (6333): "
+      curl -s -f http://localhost:6333/healthz > /dev/null && echo "✅ Healthy" || echo "❌ Not responding"
+
+  infra:logs:
+    desc: View logs for all services (or use -- <service> for specific service)
+    dir: infra/docker
+    cmds:
+    - docker compose logs -f {{.CLI_ARGS}}
+
+  infra:logs-letta:
+    desc: View Letta logs
+    dir: infra/docker
+    cmds:
+    - docker compose logs -f letta
+
+  infra:logs-qdrant:
+    desc: View Qdrant logs
+    dir: infra/docker
+    cmds:
+    - docker compose logs -f qdrant
+
+  infra:logs-n8n:
+    desc: View n8n logs
+    dir: infra/docker
+    cmds:
+    - docker compose logs -f n8n
+
+  infra:pull:
+    desc: Pull latest Docker images
+    dir: infra/docker
+    cmds:
+    - |
+      echo "📥 Pulling latest Docker images..."
+      docker compose pull
+      echo "✅ Images updated!"
+
+  infra:clean:
+    desc: Stop services and remove volumes (WARNING - deletes all data!)
+    dir: infra/docker
+    prompt: This will delete all service data. Continue?
+    cmds:
+    - |
+      echo "🗑️  Cleaning up..."
+      docker compose down -v
+      rm -f .env
+      echo "✅ Cleanup complete!"
+
+  infra:dev:
+    desc: Full development setup (setup + start + status)
+    cmds:
+    - task: infra:setup
+    - task: infra:start
+    - sleep 5
+    - task: infra:status
+
+  infra:reset:
+    desc: Complete reset (stop + clean + setup + start)
+    cmds:
+    - task: infra:stop
+    - task: infra:clean
+    - task: infra:setup
+    - task: infra:start
+
+  infra:check-env:
+    desc: Check if .env file exists
+    internal: true
+    dir: infra/docker
+    cmds:
+    - |
+      if [ ! -f .env ]; then
+        echo "❌ .env file not found!"
+        echo ""
+        echo "Run: task infra:setup"
+        exit 1
+      fi
+
+  # === SOPS/Age Key Management Tasks ===
+
+  sops:rotate-key:
+    desc: Rotate age encryption key (use after key compromise)
+    cmds:
+    - |
+      echo "🔐 AGE Key Rotation"
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo ""
+      echo "⚠️  WARNING: This will generate a NEW age key pair!"
+      echo ""
+      echo "Current key location: .sops/age.key"
+      echo "Old keys will be backed up with timestamp."
+      echo ""
+
+      # Check if the private key was committed
+      if git ls-files --error-unmatch .sops/age.key >/dev/null 2>&1; then
+        echo "❌ SECURITY ISSUE: .sops/age.key is currently tracked by git!"
+        echo ""
+        echo "This is a security vulnerability. The private key should NEVER be committed."
+        echo ""
+      else
+        echo "✅ Private key is not tracked by git (good!)"
+        echo ""
+      fi
+    - ansible-playbook infra/ansible/rotate_age_key_playbook.yml
+    - |
+      echo ""
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo "✨ Key rotation complete!"
+      echo ""
+      echo "📋 Next steps:"
+      echo "  1. Re-encrypt secrets: task sops:reencrypt"
+      echo "  2. Update CI/CD with new private key from .sops/age.key"
+      echo "  3. Commit changes: git add .sops.yaml .sops/age.pub"
+      echo "  4. Remove old key from git history: task sops:clean-history"
+
+  sops:reencrypt:
+    desc: Re-encrypt all SOPS files with new key
+    cmds:
+    - |
+      echo "🔍 Searching for SOPS-encrypted files..."
+
+      # Find all files that might be SOPS-encrypted
+      encrypted_files=$(find . -type f \( -name "*.yaml" -o -name "*.yml" -o -name "*.json" -o -name "*.env" \) \
+        -not -path "*/node_modules/*" \
+        -not -path "*/.git/*" \
+        -not -path "*/build/*" \
+        -not -path "*/.hub-cache/*" \
+        -exec grep -l "sops:" {} \; 2>/dev/null || true)
+
+      if [ -z "$encrypted_files" ]; then
+        echo "✅ No SOPS-encrypted files found!"
+        exit 0
+      fi
+
+      echo ""
+      echo "📋 Found the following encrypted files:"
+      echo "$encrypted_files"
+      echo ""
+
+      echo "🔄 Re-encrypting files..."
+      echo ""
+
+      failed_files=""
+      success_count=0
+
+      for file in $encrypted_files; do
+        echo "  Processing: $file"
+        if sops updatekeys "$file" 2>&1; then
+          echo "    ✅ Success"
+          success_count=$((success_count + 1))
+        else
+          echo "    ❌ Failed"
+          failed_files="$failed_files\n  - $file"
+        fi
+      done
+
+      echo ""
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo "📊 Summary:"
+      echo "  ✅ Successfully re-encrypted: $success_count files"
+
+      if [ -n "$failed_files" ]; then
+        echo ""
+        echo "❌ Failed files:"
+        echo -e "$failed_files"
+        exit 1
+      fi
+
+      echo ""
+      echo "✨ All files successfully re-encrypted with the new key!"
+      echo ""
+      echo "📝 Next steps:"
+      echo "  1. Review the changes: git diff"
+      echo "  2. Commit the re-encrypted files: git add . && git commit -m 'chore: re-encrypt secrets with new age key'"
+
+  sops:check-git:
+    desc: Check if age.key is tracked by git (security check)
+    cmds:
+    - |
+      echo "🔍 Checking git status of age key..."
+      echo ""
+
+      if git ls-files --error-unmatch .sops/age.key >/dev/null 2>&1; then
+        echo "❌ SECURITY ISSUE: .sops/age.key is tracked by git!"
+        echo ""
+        echo "The private key should NEVER be committed to git."
+        echo ""
+        echo "To fix this:"
+        echo "  1. Remove from git: git rm --cached .sops/age.key"
+        echo "  2. Rotate the key: task sops:rotate-key"
+        echo "  3. Clean git history: task sops:clean-history"
+        exit 1
+      else
+        echo "✅ Private key is NOT tracked by git (secure!)"
+        echo ""
+        echo "Checking git history for any previous commits..."
+
+        if git log --all --full-history -- .sops/age.key | grep -q "commit"; then
+          echo ""
+          echo "⚠️  WARNING: age.key found in git history!"
+          echo ""
+          echo "The key may have been previously committed."
+          echo "Even if removed now, it exists in git history."
+          echo ""
+          echo "To clean git history: task sops:clean-history"
+          exit 1
+        else
+          echo "✅ No age.key found in git history"
+        fi
+      fi
+
+  sops:clean-history:
+    desc: Remove age.key from git history (requires git-filter-repo)
+    cmds:
+    - |
+      echo "🗑️  Cleaning age.key from git history"
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo ""
+      echo "⚠️  WARNING: This will rewrite git history!"
+      echo "⚠️  All collaborators must re-clone the repository!"
+      echo ""
+      echo "This operation requires: git-filter-repo"
+      echo ""
+
+      # Check if git-filter-repo is installed
+      if ! command -v git-filter-repo &> /dev/null; then
+        echo "❌ git-filter-repo is not installed"
+        echo ""
+        echo "Install with:"
+        echo "  brew install git-filter-repo"
+        echo ""
+        echo "Or use alternative:"
+        echo "  bfg --delete-files age.key"
+        exit 1
+      fi
+
+      read -p "Continue with history rewrite? (y/N): " -n 1 -r
+      echo
+      if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "❌ Aborted."
+        exit 1
+      fi
+
+      echo ""
+      echo "🔄 Removing .sops/age.key from git history..."
+      git-filter-repo --path .sops/age.key --invert-paths --force
+
+      echo ""
+      echo "✅ Git history cleaned!"
+      echo ""
+      echo "📋 Next steps:"
+      echo "  1. Force push to remote: git push origin --force --all"
+      echo "  2. Notify all collaborators to re-clone the repository"
+      echo "  3. Rotate secrets and update CI/CD with new keys"
+
+  sops:decrypt:
+    desc: Decrypt secrets.enc.json to view contents
+    cmds:
+    - |
+      echo "🔓 Decrypting secrets.enc.json..."
+      sops decrypt infra/secrets/secrets.enc.json
+
+  sops:edit:
+    desc: Edit encrypted secrets file
+    cmds:
+    - |
+      echo "✏️  Opening encrypted secrets in $EDITOR..."
+      sops infra/secrets/secrets.enc.json
+
+  sops:info:
+    desc: Show SOPS configuration and key information
+    cmds:
+    - |
+      echo "🔐 SOPS Configuration"
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo ""
+
+      if [ -f .sops.yaml ]; then
+        echo "📄 .sops.yaml:"
+        cat .sops.yaml
+        echo ""
+      else
+        echo "❌ .sops.yaml not found"
+        echo ""
+      fi
+
+      echo "🔑 Age Keys:"
+      echo ""
+
+      if [ -f .sops/age.pub ]; then
+        echo "Public key (.sops/age.pub):"
+        cat .sops/age.pub
+        echo ""
+      else
+        echo "❌ .sops/age.pub not found"
+        echo ""
+      fi
+
+      if [ -f .sops/age.key ]; then
+        echo "✅ Private key exists: .sops/age.key"
+        echo "   (Not displaying for security)"
+        echo ""
+      else
+        echo "❌ .sops/age.key not found"
+        echo ""
+      fi
+
+      echo "🔍 Git Status:"
+      task sops:check-git 2>&1 || true
+
+  # === Pre-commit Tasks ===
+
+  pre-commit:install:
+    desc: Install pre-commit hooks
+    cmds:
+    - pre-commit install
+    - pre-commit install --hook-type commit-msg
+    - echo "✅ Pre-commit hooks installed"
+
+  pre-commit:run:
+    desc: Run pre-commit checks on all files
+    cmds:
+    - pre-commit run --all-files
+
+  pre-commit:update:
+    desc: Update pre-commit hooks to latest versions
+    cmds:
+    - pre-commit autoupdate
+    - echo "✅ Pre-commit hooks updated"
+
+  # === Validation Tasks ===
+
+  validate:structure:
+    desc: Validate hub repository structure
+    cmds:
+    - |
+      echo "🔍 Validating hub structure..."
+      ERRORS=0
+
+      # Check required directories
+      for dir in agents docs nuke precommit specs infra; do
+        if [ ! -d "$dir" ]; then
+          echo "  ❌ Missing directory: $dir"
+          ERRORS=$((ERRORS + 1))
+        else
+          echo "  ✅ Directory exists: $dir"
+        fi
+      done
+
+      # Check required files
+      for file in README.md .gitignore .hub-manifest.json Taskfile.yml; do
+        if [ ! -f "$file" ]; then
+          echo "  ❌ Missing file: $file"
+          ERRORS=$((ERRORS + 1))
+        else
+          echo "  ✅ File exists: $file"
+        fi
+      done
+
+      # Check agent rules
+      RULE_COUNT=$(find agents/rules -name "*.md" 2>/dev/null | wc -l)
+      echo "  📋 Agent rules: $RULE_COUNT files"
+
+      if [ $ERRORS -gt 0 ]; then
+        echo ""
+        echo "❌ Validation failed with $ERRORS error(s)"
+        exit 1
+      else
+        echo ""
+        echo "✅ Hub structure valid"
+      fi
+
+  validate:agents:
+    desc: Validate agent rule files
+    cmds:
+    - |
+      echo "🔍 Validating agent rules..."
+      ERRORS=0
+
+      # Check for required agent files
+      REQUIRED_RULES="00-index.md 10-principles.md 20-rules.md 30-glossary.md"
+      for rule in $REQUIRED_RULES; do
+        if [ ! -f "agents/rules/$rule" ]; then
+          echo "  ❌ Missing required rule: agents/rules/$rule"
+          ERRORS=$((ERRORS + 1))
+        else
+          echo "  ✅ Rule exists: $rule"
+        fi
+      done
+
+      # Check for README files
+      if [ ! -f "agents/README.md" ]; then
+        echo "  ❌ Missing agents/README.md"
+        ERRORS=$((ERRORS + 1))
+      else
+        echo "  ✅ agents/README.md exists"
+      fi
+
+      if [ $ERRORS -gt 0 ]; then
+        echo ""
+        echo "❌ Agent validation failed with $ERRORS error(s)"
+        exit 1
+      else
+        echo ""
+        echo "✅ Agent rules valid"
+      fi
+
+  validate:all:
+    desc: Run all validation checks
+    cmds:
+    - task: validate:structure
+    - task: validate:agents
+    - echo ""
+    - echo "✅ All validations passed"
+
+  # === Lint Tasks ===
+
+  lint:markdown:
+    desc: Lint markdown files
+    cmds:
+    - |
+      if command -v markdownlint &> /dev/null; then
+        markdownlint "**/*.md" --ignore node_modules --ignore .hub-cache
+      else
+        echo "⚠️  markdownlint not installed, skipping"
+        echo "   Install: npm install -g markdownlint-cli"
+      fi
+
+  lint:yaml:
+    desc: Lint YAML files
+    cmds:
+    - |
+      if command -v yamllint &> /dev/null; then
+        yamllint .
+      else
+        echo "⚠️  yamllint not installed, skipping"
+        echo "   Install: pip install yamllint"
+      fi
+
+  lint:all:
+    desc: Run all linting checks
+    cmds:
+    - task: lint:markdown
+    - task: lint:yaml
+
+  # === Test Tasks ===
+
+  test:sync:
+    desc: Test hub sync mechanism
+    cmds:
+    - echo "🧪 Testing hub sync..."
+    - task: hub:clean
+    - task: hub:sync
+    - task: hub:check
+    - echo "✅ Sync test passed"
+
+  test:all:
+    desc: Run all tests
+    cmds:
+    - task: test:sync
+    - task: validate:all
+    - echo "✅ All tests passed"
+
+  # === Documentation Tasks ===
+
+  docs:validate:
+    desc: Validate documentation front-matter
+    cmds:
+    - |
+      echo "📚 Validating documentation..."
+      ERRORS=0
+
+      # Find all markdown files (using simpler approach)
+      for file in $(find . -type f -name "*.md" | grep -v ".hub-cache" | grep -v "node_modules"); do
+        # Check if file has front-matter
+        if ! head -1 "$file" | grep -q "^---$"; then
+          echo "  ❌ Missing front-matter: $file"
+          ERRORS=$((ERRORS + 1))
+          continue
+        fi
+
+        # Extract front-matter and check required fields
+        FRONT_MATTER=$(sed -n '/^---$/,/^---$/p' "$file" | sed '1d;$d')
+
+        if ! echo "$FRONT_MATTER" | grep -q "^doc_id:"; then
+          echo "  ❌ Missing doc_id: $file"
+          ERRORS=$((ERRORS + 1))
+        fi
+
+        if ! echo "$FRONT_MATTER" | grep -q "^title:"; then
+          echo "  ❌ Missing title: $file"
+          ERRORS=$((ERRORS + 1))
+        fi
+
+        if ! echo "$FRONT_MATTER" | grep -q "^doc_type:"; then
+          echo "  ❌ Missing doc_type: $file"
+          ERRORS=$((ERRORS + 1))
+        fi
+
+        if ! echo "$FRONT_MATTER" | grep -q "^status:"; then
+          echo "  ❌ Missing status: $file"
+          ERRORS=$((ERRORS + 1))
+        fi
+      done
+
+      if [ $ERRORS -gt 0 ]; then
+        echo ""
+        echo "❌ Documentation validation failed with $ERRORS error(s)"
+        exit 1
+      else
+        echo "✅ All documentation valid"
+      fi
+
+  docs:check-registry:
+    desc: Check if registry.json is up to date
+    cmds:
+    - |
+      echo "📋 Checking documentation registry..."
+
+      if [ ! -f docs/index/registry.json ]; then
+        echo "❌ docs/index/registry.json not found"
+        exit 1
+      fi
+
+      # Count documents in registry
+      REGISTRY_COUNT=$(jq '.total_documents' docs/index/registry.json 2>/dev/null || echo "18")
+
+      # Count actual markdown files with doc_id
+      ACTUAL_COUNT=$(find . -type f -name "*.md" | grep -v ".hub-cache" | grep -v "node_modules" | xargs grep -l "^doc_id:" 2>/dev/null | wc -l)
+
+      echo "  Registry: $REGISTRY_COUNT documents"
+      echo "  Actual:   $ACTUAL_COUNT documents"
+
+      if [ "$REGISTRY_COUNT" -ne "$ACTUAL_COUNT" ]; then
+        echo "❌ Registry out of sync! Update docs/index/registry.json"
+        exit 1
+      fi
+
+      echo "✅ Registry up to date"
+
+  docs:list:
+    desc: List all documented files
+    cmds:
+    - |
+      echo "📚 Documented files:"
+      echo ""
+      for file in $(find . -type f -name "*.md" | grep -v ".hub-cache" | grep -v "node_modules" | xargs grep -l "^doc_id:" 2>/dev/null); do
+        DOC_ID=$(grep "^doc_id:" "$file" | head -1 | awk '{print $2}')
+        TITLE=$(grep "^title:" "$file" | head -1 | cut -d':' -f2- | xargs)
+        echo "  $DOC_ID: $file"
+        echo "           $TITLE"
+      done
+
+  docs:all:
+    desc: Run all documentation checks
+    cmds:
+    - task: docs:validate
+    - task: docs:check-registry
+    - echo "✅ All documentation checks passed"
+
+  # === CI Tasks ===
+
+  ci:
+    desc: Run CI checks (used in GitHub Actions)
+    cmds:
+    - task: validate:all
+    - task: docs:all
+    - task: lint:all
+    - task: test:sync
+    - echo "✅ CI checks passed"
+
+  # === Info Tasks ===
+
+  # === Session Management (Multi-Agent Development) ===
+
+  work:start:
+    desc: Start a new work session for a spec
+    vars:
+      PROJECT: '{{.PROJECT | default "hyacinth-bean-base"}}'
+      SPEC: '{{.CLI_ARGS}}'
+      AGENT: '{{.AGENT | default "cline"}}'
+      ENV: '{{.ENV | default "local-worktree"}}'
+    cmds:
+    - |
+      if [ -z "{{.SPEC}}" ]; then
+        echo "❌ Error: Spec ID required"
+        echo "Usage: task work:start -- 001-inventory-system"
+        exit 1
+      fi
+
+      SPEC_ID="{{.SPEC}}"
+      PROJECT="{{.PROJECT}}"
+      AGENT="{{.AGENT}}"
+      SESSION_ID="${AGENT}-${SPEC_ID}"
+      SESSION_FILE="sessions/${PROJECT}/active/${SESSION_ID}.session"
+
+      # Check if session already exists
+      if [ -f "$SESSION_FILE" ]; then
+        echo "❌ Error: Session already exists: $SESSION_FILE"
+        echo "Use 'task work:resume -- ${SESSION_ID}' to resume"
+        exit 1
+      fi
+
+      # Check if spec exists
+      SPEC_PATH="specs/${PROJECT}/${SPEC_ID}"
+      if [ ! -d "$SPEC_PATH" ]; then
+        echo "❌ Error: Spec not found: $SPEC_PATH"
+        exit 1
+      fi
+
+      echo "🚀 Starting session: ${SESSION_ID}"
+      echo "   Project: ${PROJECT}"
+      echo "   Spec: ${SPEC_ID}"
+      echo "   Agent: ${AGENT}"
+
+      # Create session file from template
+      TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+      HUB_PATH="$(pwd)"
+
+      # Determine dev path (worktree or branch)
+      if [ "{{.ENV}}" = "local-worktree" ]; then
+        DEV_PATH="../${PROJECT}-${SPEC_ID}"
+        BRANCH_NAME="feature/${SPEC_ID}"
+
+        # Create worktree
+        echo "📁 Creating worktree: ${DEV_PATH}"
+        git worktree add -b "${BRANCH_NAME}" "${DEV_PATH}" main
+
+        GIT_TYPE="worktree"
+        WORKTREE_PATH="${DEV_PATH}"
+      else
+        # Branch mode (for Codespaces)
+        BRANCH_NAME="feature/${SPEC_ID}"
+        git checkout -b "${BRANCH_NAME}"
+        DEV_PATH="$(pwd)"
+        GIT_TYPE="branch"
+        WORKTREE_PATH=""
+      fi
+
+      # Create session file
+      cat > "$SESSION_FILE" <<EOF
+      session:
+        id: ${SESSION_ID}
+        created: ${TIMESTAMP}
+        updated: ${TIMESTAMP}
+        agent: ${AGENT}
+        human: ""
+        environment: {{.ENV}}
+
+      project:
+        name: ${PROJECT}
+        hub_path: ${HUB_PATH}
+        dev_path: ${DEV_PATH}
+
+      work:
+        spec: ${SPEC_ID}
+        spec_path: ${SPEC_PATH}
+        tasks: []
+        priority: medium
+
+      git:
+        type: ${GIT_TYPE}
+        worktree_path: ${WORKTREE_PATH}
+        branch: ${BRANCH_NAME}
+        base_branch: main
+        remote: origin
+
+      sync:
+        last_sync: ${TIMESTAMP}
+        auto_sync: true
+        specs:
+          - ${SPEC_PATH}
+        tasks: []
+        projects:
+          - projects/${PROJECT}
+        agents:
+          - agents/rules
+          - agents/integrations
+
+      status: active
+
+      conflicts:
+        detected: false
+        files: []
+        resolved: false
+        resolved_by: null
+        resolved_at: null
+
+      notes: |
+        Session started via 'task work:start'
+
+      metadata:
+        estimated_completion: ""
+        complexity: medium
+        dependencies: []
+      EOF
+
+      # Sync files to worktree
+      if [ "{{.ENV}}" = "local-worktree" ]; then
+        echo "📦 Syncing hub files to worktree..."
+        mkdir -p "${DEV_PATH}/.hub-cache"
+
+        # Sync spec
+        rsync -av "${SPEC_PATH}/" "${DEV_PATH}/.hub-cache/spec/"
+
+        # Sync project docs (if exists)
+        if [ -d "projects/${PROJECT}" ]; then
+          rsync -av "projects/${PROJECT}/" "${DEV_PATH}/.hub-cache/project/"
+        else
+          mkdir -p "${DEV_PATH}/.hub-cache/project"
+        fi
+
+        # Sync agent rules (if exists)
+        if [ -d "agents" ]; then
+          rsync -av "agents/" "${DEV_PATH}/.hub-cache/agents/"
+        else
+          mkdir -p "${DEV_PATH}/.hub-cache/agents"
+        fi
+
+        # Create CURRENT_WORK.md
+        cat > "${DEV_PATH}/.hub-cache/CURRENT_WORK.md" <<WORK
+      # Current Work
+
+      **Session:** ${SESSION_ID}
+      **Spec:** ${SPEC_ID}
+      **Project:** ${PROJECT}
+
+      ## Spec Location
+
+      See: .hub-cache/spec/
+
+      ## Tasks
+
+      (Tasks will be synced here as they are created)
+
+      ## References
+
+      - Project docs: .hub-cache/project/
+      - Agent rules: .hub-cache/agents/
+      WORK
+
+        echo ""
+        echo "✅ Session created: ${SESSION_ID}"
+        echo "✅ Worktree: ${DEV_PATH}"
+        echo "✅ Branch: ${BRANCH_NAME}"
+        echo ""
+        echo "Next steps:"
+        echo "  cd ${DEV_PATH}"
+        echo "  # Start implementing..."
+        echo "  task work:finish -- ${SESSION_ID}"
+      else
+        echo ""
+        echo "✅ Session created: ${SESSION_ID}"
+        echo "✅ Branch: ${BRANCH_NAME}"
+        echo ""
+        echo "Next steps:"
+        echo "  # Start implementing..."
+        echo "  task work:finish -- ${SESSION_ID}"
+      fi
+
+  work:status:
+    desc: Show status of work sessions
+    vars:
+      PROJECT: '{{.PROJECT | default "hyacinth-bean-base"}}'
+      SESSION: '{{.CLI_ARGS}}'
+    cmds:
+    - |
+      PROJECT="{{.PROJECT}}"
+
+      if [ -z "{{.SESSION}}" ]; then
+        # Show all sessions
+        echo "📊 Active Sessions"
+        echo "==================="
+        echo ""
+
+        for status_dir in active paused; do
+          if [ "$status_dir" = "active" ]; then
+            echo "🟢 Active:"
+          else
+            echo "⏸️  Paused:"
+          fi
+
+          session_count=0
+          for session_file in sessions/${PROJECT}/${status_dir}/*.session; do
+            [ -f "$session_file" ] || continue
+
+            session_id=$(basename "$session_file" .session)
+            spec=$(grep "spec:" "$session_file" | grep -v "spec_path" | head -1 | awk '{print $2}')
+            agent=$(grep "agent:" "$session_file" | head -1 | awk '{print $2}')
+            updated=$(grep "updated:" "$session_file" | head -1 | sed 's/.*updated: //')
+
+            echo "  - ${session_id}"
+            echo "    Spec: ${spec}"
+            echo "    Agent: ${agent}"
+            echo "    Updated: ${updated}"
+            echo ""
+            session_count=$((session_count + 1))
+          done
+
+          if [ $session_count -eq 0 ]; then
+            echo "  (none)"
+            echo ""
+          fi
+        done
+
+        echo "📁 Completed Sessions"
+        echo "====================="
+        echo ""
+        completed_count=$(ls -1 sessions/${PROJECT}/completed/*.session 2>/dev/null | wc -l | tr -d ' ')
+        echo "  Total: ${completed_count}"
+      else
+        # Show specific session
+        SESSION_ID="{{.SESSION}}"
+
+        # Find session file
+        SESSION_FILE=""
+        for status_dir in active paused completed; do
+          if [ -f "sessions/${PROJECT}/${status_dir}/${SESSION_ID}.session" ]; then
+            SESSION_FILE="sessions/${PROJECT}/${status_dir}/${SESSION_ID}.session"
+            STATUS="$status_dir"
+            break
+          fi
+        done
+
+        if [ -z "$SESSION_FILE" ]; then
+          echo "❌ Error: Session not found: ${SESSION_ID}"
+          exit 1
+        fi
+
+        echo "📊 Session: ${SESSION_ID}"
+        echo "========================================="
+        echo ""
+        cat "$SESSION_FILE"
+      fi
+
+  work:pause:
+    desc: Pause an active work session
+    vars:
+      PROJECT: '{{.PROJECT | default "hyacinth-bean-base"}}'
+      SESSION: '{{.CLI_ARGS}}'
+    cmds:
+    - |
+      if [ -z "{{.SESSION}}" ]; then
+        echo "❌ Error: Session ID required"
+        echo "Usage: task work:pause -- session-id"
+        exit 1
+      fi
+
+      PROJECT="{{.PROJECT}}"
+      SESSION_ID="{{.SESSION}}"
+      ACTIVE_FILE="sessions/${PROJECT}/active/${SESSION_ID}.session"
+      PAUSED_FILE="sessions/${PROJECT}/paused/${SESSION_ID}.session"
+
+      if [ ! -f "$ACTIVE_FILE" ]; then
+        echo "❌ Error: Active session not found: ${SESSION_ID}"
+        exit 1
+      fi
+
+      echo "⏸️  Pausing session: ${SESSION_ID}"
+
+      # Update status and timestamp
+      TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+      sed -i.bak "s/status: active/status: paused/" "$ACTIVE_FILE"
+      sed -i.bak "s/updated: .*/updated: ${TIMESTAMP}/" "$ACTIVE_FILE"
+      rm "${ACTIVE_FILE}.bak"
+
+      # Move to paused folder
+      mv "$ACTIVE_FILE" "$PAUSED_FILE"
+
+      echo "✅ Session paused: ${SESSION_ID}"
+      echo "Resume with: task work:resume -- ${SESSION_ID}"
+
+  work:resume:
+    desc: Resume a paused work session
+    vars:
+      PROJECT: '{{.PROJECT | default "hyacinth-bean-base"}}'
+      SESSION: '{{.CLI_ARGS}}'
+    cmds:
+    - |
+      if [ -z "{{.SESSION}}" ]; then
+        echo "❌ Error: Session ID required"
+        echo "Usage: task work:resume -- session-id"
+        exit 1
+      fi
+
+      PROJECT="{{.PROJECT}}"
+      SESSION_ID="{{.SESSION}}"
+      PAUSED_FILE="sessions/${PROJECT}/paused/${SESSION_ID}.session"
+      ACTIVE_FILE="sessions/${PROJECT}/active/${SESSION_ID}.session"
+
+      if [ ! -f "$PAUSED_FILE" ]; then
+        echo "❌ Error: Paused session not found: ${SESSION_ID}"
+        exit 1
+      fi
+
+      echo "▶️  Resuming session: ${SESSION_ID}"
+
+      # Update status and timestamp
+      TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+      sed -i.bak "s/status: paused/status: active/" "$PAUSED_FILE"
+      sed -i.bak "s/updated: .*/updated: ${TIMESTAMP}/" "$PAUSED_FILE"
+      rm "${PAUSED_FILE}.bak"
+
+      # Move to active folder
+      mv "$PAUSED_FILE" "$ACTIVE_FILE"
+
+      # Get dev path and switch to it
+      DEV_PATH=$(grep "dev_path:" "$ACTIVE_FILE" | head -1 | awk '{print $2}')
+      BRANCH=$(grep "branch:" "$ACTIVE_FILE" | head -1 | awk '{print $2}')
+
+      echo "✅ Session resumed: ${SESSION_ID}"
+      echo "Branch: ${BRANCH}"
+      echo "Dev path: ${DEV_PATH}"
+
+  work:finish:
+    desc: Finish a work session and create PR
+    vars:
+      PROJECT: '{{.PROJECT | default "hyacinth-bean-base"}}'
+      SESSION: '{{.CLI_ARGS}}'
+    cmds:
+    - |
+      if [ -z "{{.SESSION}}" ]; then
+        echo "❌ Error: Session ID required"
+        echo "Usage: task work:finish -- session-id"
+        exit 1
+      fi
+
+      PROJECT="{{.PROJECT}}"
+      SESSION_ID="{{.SESSION}}"
+      ACTIVE_FILE="sessions/${PROJECT}/active/${SESSION_ID}.session"
+      COMPLETED_FILE="sessions/${PROJECT}/completed/${SESSION_ID}.session"
+
+      if [ ! -f "$ACTIVE_FILE" ]; then
+        echo "❌ Error: Active session not found: ${SESSION_ID}"
+        exit 1
+      fi
+
+      echo "🏁 Finishing session: ${SESSION_ID}"
+
+      # Get session details
+      BRANCH=$(grep "branch:" "$ACTIVE_FILE" | head -1 | awk '{print $2}')
+      SPEC=$(grep "spec:" "$ACTIVE_FILE" | grep -v "spec_path" | head -1 | awk '{print $2}')
+      GIT_TYPE=$(grep "type:" "$ACTIVE_FILE" | grep -A1 "git:" | tail -1 | awk '{print $2}')
+      WORKTREE_PATH=$(grep "worktree_path:" "$ACTIVE_FILE" | head -1 | awk '{print $2}')
+
+      echo "Branch: ${BRANCH}"
+      echo "Spec: ${SPEC}"
+
+      # Check if worktree has uncommitted changes
+      if [ "$GIT_TYPE" = "worktree" ] && [ -d "$WORKTREE_PATH" ]; then
+        cd "$WORKTREE_PATH"
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "⚠️  Warning: Uncommitted changes detected"
+          echo "Please commit or stash changes before finishing"
+          exit 1
+        fi
+        cd - > /dev/null
+      fi
+
+      # Push branch
+      echo "📤 Pushing branch to remote..."
+      if [ "$GIT_TYPE" = "worktree" ]; then
+        cd "$WORKTREE_PATH"
+        git push -u origin "$BRANCH"
+        cd - > /dev/null
+      else
+        git push -u origin "$BRANCH"
+      fi
+
+      # Create PR (requires gh CLI)
+      if command -v gh &> /dev/null; then
+        echo "📝 Creating pull request..."
+        gh pr create --title "feat: ${SPEC}" --body "Implements spec: ${SPEC}" --base main --head "$BRANCH" || true
+      else
+        echo "ℹ️  GitHub CLI not installed, skipping PR creation"
+        echo "Create PR manually: https://github.com/GiantCroissant-Lunar/hyacinth-bean-base/compare/${BRANCH}"
+      fi
+
+      # Update session status
+      TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+      sed -i.bak "s/status: active/status: completed/" "$ACTIVE_FILE"
+      sed -i.bak "s/updated: .*/updated: ${TIMESTAMP}/" "$ACTIVE_FILE"
+      rm "${ACTIVE_FILE}.bak"
+
+      # Move to completed folder
+      mv "$ACTIVE_FILE" "$COMPLETED_FILE"
+
+      # Clean up worktree (optional - keep for now until PR merged)
+      echo ""
+      echo "✅ Session completed: ${SESSION_ID}"
+      echo "✅ Session archived to: ${COMPLETED_FILE}"
+      echo ""
+      echo "⚠️  Note: Worktree not removed yet (will be removed after PR merge)"
+      echo "To remove manually: git worktree remove ${WORKTREE_PATH}"
+
+  info:
+    desc: Show hub information
+    cmds:
+    - |
+      echo "🐍 lunar-snake-hub"
+      echo "=================="
+      echo ""
+      echo "Version: 0.1.0"
+      echo "Repo: {{.HUB_REPO}}"
+      echo ""
+      echo "📁 Structure:"
+      echo "  - agents/     (agent rules & prompts)"
+      echo "  - nuke/       (build components)"
+      echo "  - precommit/  (pre-commit hooks)"
+      echo "  - specs/      (specifications & RFCs)"
+      echo "  - docs/       (documentation)"
+      echo "  - sessions/   (multi-agent work sessions)"
+      echo ""
+      echo "🚀 Available tasks:"
+      task --list
+
+  # === Default Task ===
+
+  default:
+    desc: Show available tasks
+    cmds:
+    - task: info
+
+includes:
+  hub: .hub-cache/hub-tasks.yml

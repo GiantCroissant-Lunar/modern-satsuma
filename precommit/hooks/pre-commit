@@ -1,0 +1,19 @@
+#!/bin/bash
+# Custom pre-commit hook
+# This runs before each commit
+
+set -e
+
+echo "Running custom pre-commit checks..."
+
+# Example: Check for TODO comments in staged files
+if git diff --cached --name-only | xargs grep -n "TODO" 2>/dev/null; then
+    echo "Warning: Found TODO comments in staged files"
+fi
+
+# Example: Check for console.log in JavaScript files
+if git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|ts)$' | xargs grep -n "console.log" 2>/dev/null; then
+    echo "Warning: Found console.log statements"
+fi
+
+echo "✓ Custom pre-commit checks passed"
