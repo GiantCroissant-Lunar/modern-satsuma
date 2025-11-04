@@ -11,6 +11,7 @@ This directory contains Request for Comments (RFC) documents for modernizing the
 | [RFC-003](./RFC-003-modern-csharp-syntax.md) | Modern C# Syntax Adoption | ⚠️ Partial | P1 - High |
 | [RFC-004](./RFC-004-api-modernization.md) | API Surface Modernization | 🔴 Proposed | P2 - Medium |
 | [RFC-005](./RFC-005-performance-optimization.md) | Performance & Memory Optimization | 🔴 Proposed | P3 - Low |
+| [RFC-006](./RFC-006-drawing-test-suite.md) | Drawing Test Suite | 🔴 Proposed | P1 - High |
 
 ## Status Definitions
 
