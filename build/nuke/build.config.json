@@ -1,0 +1,12 @@
+{
+  "sourceDir": "src",
+  "websiteDir": "../../website",
+  "frameworkDirs": ["src"],
+  "syncLocalNugetFeed": false,
+  "includePluginNames": [],
+  "excludePluginNames": [],
+  "localNugetFeedRoot": "",
+  "localNugetFeedFlatSubdir": "flat",
+  "localNugetFeedHierarchicalSubdir": "hierarchical",
+  "localNugetFeedBaseUrl": ""
+}
