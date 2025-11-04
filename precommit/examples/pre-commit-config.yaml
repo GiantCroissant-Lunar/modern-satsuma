@@ -1,0 +1,65 @@
+# Example .pre-commit-config.yaml for lablab-bean project
+# Copy this to your project root as .pre-commit-config.yaml
+
+repos:
+- repo: local
+  hooks:
+      # General checks
+  - id: gitleaks
+    name: Gitleaks (Secret Detection)
+    entry: ./git-hooks/checks/general/gitleaks-check
+    language: script
+    pass_filenames: false
+    stages: [commit]
+
+
+  - id: validate-agent-pointers
+    name: Validate Agent Pointers
+    entry: python ./git-hooks/checks/general/validate_agent_pointers.py
+    language: system
+    pass_filenames: false
+
+      # .NET specific checks
+  - id: dotnet-format
+    name: .NET Format Check
+    entry: ./git-hooks/checks/dotnet/dotnet-format-check
+    language: script
+    files: \.(cs|csproj|sln)$
+    pass_filenames: false
+
+  - id: one-type-per-file
+    name: One Type Per File Check
+    entry: ./git-hooks/checks/dotnet/one-type-per-file-check
+    language: script
+    files: \.cs$
+    pass_filenames: false
+
+      # Python specific checks
+  - id: python-check
+    name: Python Code Quality (Ruff + MyPy)
+    entry: ./git-hooks/checks/python/python-check
+    language: script
+    files: \.py$
+    pass_filenames: false
+
+  # Third-party formatters/linters
+- repo: https://github.com/igorshubovych/markdownlint-cli
+  rev: v0.39.0
+  hooks:
+  - id: markdownlint
+    args: [--fix]
+
+- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  rev: v2.12.0
+  hooks:
+  - id: pretty-format-yaml
+    args: [--autofix, --indent, '2']
+
+  # Optional: Add external repos for additional checks
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.4.0
+  hooks:
+  - id: trailing-whitespace
+  - id: end-of-file-fixer
+  - id: check-merge-conflict
+  - id: check-added-large-files

@@ -1,0 +1,18 @@
+#!/bin/bash
+# Git-leaks check for secrets
+
+set -e
+
+# Source common utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../../utils/common.sh"
+
+check_git_repo
+
+if ! command_exists gitleaks; then
+    log_warning "gitleaks not found. Install from: https://github.com/gitleaks/gitleaks"
+    exit 0
+fi
+
+# Run gitleaks on staged files
+run_check "Gitleaks secret detection" "gitleaks detect --source . --verbose --no-git"

@@ -1,0 +1,20 @@
+#!/bin/bash
+# Custom commit-msg hook
+# Validates commit message format
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Check commit message format (Conventional Commits)
+if ! echo "$COMMIT_MSG" | grep -qE "^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?: .{1,}"; then
+    echo "Error: Commit message does not follow Conventional Commits format"
+    echo ""
+    echo "Format: <type>(<scope>): <subject>"
+    echo ""
+    echo "Types: feat, fix, docs, style, refactor, test, chore, perf, ci, build, revert"
+    echo ""
+    echo "Example: feat(api): add user authentication"
+    exit 1
+fi
+
+echo "✓ Commit message format is valid"
