@@ -2,10 +2,12 @@ using FluentAssertions;
 using Plate.ModernSatsuma.Abstractions;
 using Plate.ModernSatsuma.Drawing.SystemDrawing;
 using System.IO;
+using System.Runtime.Versioning;
 using Xunit;
 
 namespace Plate.ModernSatsuma.Drawing.SystemDrawing.Tests
 {
+    [SupportedOSPlatform("windows")]
     public class SystemDrawingIntegrationTests
     {
         private readonly SystemDrawingRenderSurfaceFactory _surfaceFactory;

@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <!-- Enable extended analyzer rules for analyzer/source generator projects (RS1036) -->
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+
+    <!-- Analyzer / source generator packaging -->
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <IsRoslynComponent>true</IsRoslynComponent>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Reference core library so attributes can use Directedness, CustomGraph, etc. -->
+    <ProjectReference Include="..\Plate.ModernSatsuma\Plate.ModernSatsuma.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Make generator-specific properties visible to the compiler (for debugging) -->
+    <CompilerVisibleProperty Include="EmitCompilerGeneratedFiles" />
+    <CompilerVisibleProperty Include="CompilerGeneratedFilesOutputPath" />
+  </ItemGroup>
+
+</Project>

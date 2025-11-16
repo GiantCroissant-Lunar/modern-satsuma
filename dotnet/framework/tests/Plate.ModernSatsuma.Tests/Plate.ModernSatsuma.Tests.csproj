@@ -25,6 +25,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Plate.ModernSatsuma\Plate.ModernSatsuma.csproj" />
+    <ProjectReference Include="..\..\src\Plate.ModernSatsuma.SourceGenerators\Plate.ModernSatsuma.SourceGenerators.csproj"
+                      OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

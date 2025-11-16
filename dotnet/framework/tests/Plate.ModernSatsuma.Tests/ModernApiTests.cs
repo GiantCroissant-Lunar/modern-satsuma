@@ -192,7 +192,8 @@ namespace Plate.ModernSatsuma.Test
             // Arrange
             var graph = CreateLargeGraph();
             using var cts = new CancellationTokenSource();
-            cts.CancelAfter(TimeSpan.FromMilliseconds(1)); // Cancel very quickly
+            // Cancel immediately so cancellation is guaranteed before the async run.
+            cts.Cancel();
 
             // Act & Assert
             var act = async () => await DijkstraBuilder
@@ -219,6 +220,40 @@ namespace Plate.ModernSatsuma.Test
             // Assert
             result.Should().NotBeNull();
             result.Reached(new Node(3)).Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task AStarBuilder_RunUntilReachedAsync_ShouldCompleteSuccessfully()
+        {
+            var graph = CreateGridGraph();
+            using var cts = new CancellationTokenSource();
+
+            var result = await AStarBuilder
+                .Create(graph)
+                .WithCost(arc => 1.0)
+                .WithHeuristic(node => ManhattanDistance(node, new Node(9)))
+                .AddSource(new Node(1))
+                .RunUntilReachedAsync(new Node(9), cts.Token);
+
+            result.Should().NotBeNull();
+            result.GetDistance(new Node(9)).Should().NotBe(double.PositiveInfinity);
+        }
+
+        [Fact]
+        public async Task AStarBuilder_RunUntilReachedAsync_WithCancellation_ShouldRespectCancellation()
+        {
+            var graph = CreateGridGraph();
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            var act = async () => await AStarBuilder
+                .Create(graph)
+                .WithCost(arc => 1.0)
+                .WithHeuristic(node => ManhattanDistance(node, new Node(9)))
+                .AddSource(new Node(1))
+                .RunUntilReachedAsync(new Node(9), cts.Token);
+
+            await act.Should().ThrowAsync<OperationCanceledException>();
         }
 
         #endregion

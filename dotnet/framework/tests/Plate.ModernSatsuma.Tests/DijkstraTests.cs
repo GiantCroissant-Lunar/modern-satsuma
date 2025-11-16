@@ -3,10 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Plate.ModernSatsuma;
+using Plate.ModernSatsuma.Generators;
 using Xunit;
 
 namespace Plate.ModernSatsuma.Test
 {
+    [GraphBuilder(GraphType = typeof(CustomGraph))]
+    public partial class SimpleDijkstraGraphBuilder
+    {
+        [NodeAttribute]
+        public Node One { get; private set; }
+
+        [NodeAttribute]
+        public Node Two { get; private set; }
+
+        [NodeAttribute]
+        public Node Three { get; private set; }
+
+        [ArcAttribute(Cost = 2.0)]
+        public void One_to_Two(Node from, Node to)
+        {
+        }
+
+        [ArcAttribute(Cost = 1.0)]
+        public void Two_to_Three(Node from, Node to)
+        {
+        }
+    }
+
     /// <summary>
     /// Comprehensive tests for Dijkstra's shortest path algorithm
     /// </summary>
@@ -17,6 +41,7 @@ namespace Plate.ModernSatsuma.Test
         {
             // Arrange
             var graph = CreateSimpleTestGraph();
+            
             var dijkstra = new Dijkstra(graph, GetEdgeWeight, DijkstraMode.Sum);
             
             // Act
@@ -30,6 +55,45 @@ namespace Plate.ModernSatsuma.Test
             var path = dijkstra.GetPath(new Node(3));
             path.Should().NotBeNull();
             path!.NodeCount().Should().Be(3); // nodes 1, 2, 3
+        }
+
+        [Fact]
+        public void Dijkstra_BasicShortestPath_UsingGraphBuilder_ShouldFindOptimalRoute()
+        {
+            // Arrange
+            var builder = new SimpleDijkstraGraphBuilder();
+            var graph = builder.BuildGraph();
+            var dijkstra = new Dijkstra(graph, GetEdgeWeight, DijkstraMode.Sum);
+
+            // Act
+            dijkstra.AddSource(builder.One);
+            dijkstra.Run();
+
+            // Assert
+            dijkstra.Reached(builder.Three).Should().BeTrue();
+            dijkstra.GetDistance(builder.Three).Should().Be(3.0);
+
+            var path = dijkstra.GetPath(builder.Three);
+            path.Should().NotBeNull();
+            path!.NodeCount().Should().Be(3);
+        }
+
+        [Fact]
+        public void Dijkstra_BasicShortestPath_UsingGraphBuilderCostFunction_ShouldRespectArcCosts()
+        {
+            // Arrange
+            var builder = new SimpleDijkstraGraphBuilder();
+            var graph = builder.BuildGraph();
+            var cost = builder.CreateCostFunction();
+            var dijkstra = new Dijkstra(graph, cost, DijkstraMode.Sum);
+
+            // Act
+            dijkstra.AddSource(builder.One);
+            dijkstra.Run();
+
+            // Assert
+            dijkstra.Reached(builder.Three).Should().BeTrue();
+            dijkstra.GetDistance(builder.Three).Should().Be(3.0);
         }
 
         [Fact]

@@ -54,7 +54,7 @@ namespace Plate.ModernSatsuma.Drawing.SkiaSharp
             TextBrush = factory.CreateBrush(Abstractions.Color.Black);
         }
 
-        public void DrawNode(IGraphicsContext graphics, double x, double y, string text)
+        public void DrawNode(IGraphicsContext graphics, double x, double y, string? text)
         {
             var state = graphics.Save();
             graphics.Translate(x, y);

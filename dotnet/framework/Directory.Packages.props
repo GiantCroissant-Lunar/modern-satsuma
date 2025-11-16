@@ -15,5 +15,9 @@
     <!-- Drawing Packages -->
     <PackageVersion Include="System.Drawing.Common" Version="8.0.0" />
     <PackageVersion Include="SkiaSharp" Version="3.119.1" />
+
+    <!-- Source Generator / Roslyn Packages -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,5 @@
+root = true
+
+[*.cs]
+# Treat platform-compatibility warnings as suggestions (especially for System.Drawing-based drawing code)
+dotnet_diagnostic.CA1416.severity = suggestion
