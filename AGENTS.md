@@ -31,7 +31,7 @@ Project Rules (this project only)
 
 ## Project Overview
 
-**Purpose**: Modernized version of the Satsuma Graph Library for .NET Standard 2.0+
+**Purpose**: Modernized version of the Satsuma Graph Library for .NET Standard 2.1+
 
 **Key Features**:
 - Graph algorithms (Dijkstra, A*, BFS, DFS, Bellman-Ford)
@@ -40,28 +40,26 @@ Project Rules (this project only)
 - Graph transformations and I/O (GraphML, Lemon format)
 - Linear programming framework
 
-**Status**: 🚧 Under active development - build currently failing (known issues)
+**Status**: 🚧 Under active development - core projects build successfully; historical docs still reference earlier build issues
 
 ---
 
 ## Important Context
 
-### 🚨 Known Issues (Build Blockers)
+### ✅ Historical Build Blockers (Now Resolved)
 
 1. **Duplicate IClearable Interface**
-   - Location: `dotnet/framework/src/Plate.ModernSatsuma/Graph.cs` AND `Utils.cs`
-   - Impact: CS0101 compilation error
-   - Fix: Remove from `Utils.cs`, keep in `Graph.cs`
+   - Originally: `IClearable` was defined in both `Graph.cs` and `Utils.cs`, causing CS0101.
+   - Current: Definition is kept only in `Graph.cs`; `Utils.cs` no longer declares `IClearable`.
 
-2. **System.Drawing Dependencies**
-   - Location: `dotnet/framework/src/Plate.ModernSatsuma/Drawing.cs`
-   - Impact: CS0234/CS0246 errors (types not found)
-   - Fix Options:
-     - Quick: Exclude `Drawing.cs` from build
-     - Full: Add `System.Drawing.Common` package (deprecated)
-     - Future: Rewrite with SkiaSharp
+2. **System.Drawing Dependencies in Drawing.cs**
+   - Originally: `Drawing.cs` referenced `System.Drawing` types not available on .NET Standard.
+   - Current: Core project excludes `Drawing.cs` and instead uses a pluggable architecture:
+     - `Plate.ModernSatsuma.Abstractions` for drawing interfaces
+     - `Plate.ModernSatsuma.Drawing.SystemDrawing` for System.Drawing-based rendering
+     - `Plate.ModernSatsuma.Drawing.SkiaSharp` for cross-platform SkiaSharp rendering
 
-See `docs/FIX_ACTION_PLAN.md` for detailed resolution steps.
+See `docs/FIX_ACTION_PLAN.md` and `docs/analysis/MODERNIZATION_ANALYSIS.md` for historical details.
 
 ### 📋 Key Documentation
 
@@ -77,36 +75,30 @@ See `docs/FIX_ACTION_PLAN.md` for detailed resolution steps.
 ```
 modern-satsuma/
 ├── dotnet/framework/
-│   ├── Plate.ModernSatsuma.sln              # Solution file
-│   ├── Directory.Packages.props              # Central package management
-│   ├── src/Plate.ModernSatsuma/             # Main library
-│   │   ├── Graph.cs                         # Core graph types
-│   │   ├── Dijsktra.cs, BellmanFord.cs, ... # Algorithms
-│   │   ├── Drawing.cs                       # ⚠️ Currently broken
-│   │   └── Utils.cs                         # ⚠️ Has duplicate interface
-│   └── tests/Plate.ModernSatsuma.Tests/     # Unit tests
-├── build/                                    # Build artifacts
-├── docs/                                     # Documentation
-└── scripts/                                  # Build scripts (future)
+│   ├── Plate.ModernSatsuma.sln                 # Solution file
+│   ├── Directory.Packages.props                # Central package management
+│   ├── src/Plate.ModernSatsuma/                # Core graph library (netstandard2.1)
+│   │   ├── Graph.cs                            # Core graph types
+│   │   ├── Dijsktra.cs, BellmanFord.cs, ...    # Algorithms
+│   │   ├── Drawing.cs                          # Retained for reference, excluded from core build
+│   │   └── Utils.cs                            # Utilities (no IClearable definition)
+│   ├── src/Plate.ModernSatsuma.Abstractions/   # Drawing/layout abstractions
+│   ├── src/Plate.ModernSatsuma.Drawing.SystemDrawing/  # System.Drawing renderer
+│   ├── src/Plate.ModernSatsuma.Drawing.SkiaSharp/      # SkiaSharp renderer
+│   └── tests/                                 # Unit tests for core and renderers
+└── docs/                                      # Documentation
 ```
 
 ---
 
 ## Build Commands
 
-### Current Status: ❌ Build Fails
+### Current Status: ✅ Core Projects Build
 
 ```bash
 cd dotnet/framework
 dotnet restore
-dotnet build  # Fails with IClearable + Drawing.cs errors
-```
-
-### After Fixes: ✅ Should Build
-
-```bash
-cd dotnet/framework
-dotnet build  # Should succeed
+dotnet build  # Core and renderer projects should build successfully
 dotnet test   # Run tests
 ```
 

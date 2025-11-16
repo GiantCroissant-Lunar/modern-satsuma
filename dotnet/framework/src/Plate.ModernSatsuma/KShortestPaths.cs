@@ -62,12 +62,14 @@ public static class KShortestPaths
 		}
 
 		result.Add(firstPath);
+		var knownSignatures = new HashSet<string> { BuildPathSignature(firstPath) };
 		if (k == 1)
 		{
 			return result;
 		}
 
 		var candidates = new List<CandidatePath>();
+		var candidateSignatures = new HashSet<string>();
 
 		for (int pathIndex = 1; pathIndex < k; pathIndex++)
 		{
@@ -135,14 +137,14 @@ public static class KShortestPaths
 				}
 
 				var signature = BuildPathSignature(candidate);
-				if (result.Any(p => BuildPathSignature(p) == signature) ||
-				    candidates.Any(c => c.Signature == signature))
+				if (knownSignatures.Contains(signature) || candidateSignatures.Contains(signature))
 				{
 					continue; // Avoid duplicates
 				}
 
 				var totalCost = ComputePathCost(candidate, cost, mode);
 				candidates.Add(new CandidatePath(totalCost, candidate, signature));
+				candidateSignatures.Add(signature);
 			}
 
 			if (candidates.Count == 0)
@@ -162,7 +164,9 @@ public static class KShortestPaths
 
 			var best = candidates[bestIndex];
 			candidates.RemoveAt(bestIndex);
+			candidateSignatures.Remove(best.Signature);
 			result.Add(best.Path);
+			knownSignatures.Add(best.Signature);
 		}
 
 		return result;

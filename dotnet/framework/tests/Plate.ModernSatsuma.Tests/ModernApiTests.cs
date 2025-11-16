@@ -163,6 +163,47 @@ namespace Plate.ModernSatsuma.Test
             result.GetDistance(new Node(9)).Should().NotBe(double.PositiveInfinity);
         }
 
+        [Fact]
+        public void BidirectionalDijkstraBuilder_BasicConfiguration_ShouldWork()
+        {
+            var graph = CreateConnectedGraph();
+            var path = BidirectionalDijkstraBuilder
+                .Create(graph)
+                .WithCost(_ => 1.0)
+                .From(new Node(1))
+                .To(new Node(3))
+                .Run();
+
+            path.Should().NotBeNull();
+            path!.Nodes().Should().ContainInOrder(new Node(1), new Node(2), new Node(3));
+        }
+
+        [Fact]
+        public void BidirectionalDijkstraBuilder_WithMaximumMode_ShouldFallbackToDijkstraSemantics()
+        {
+            var graph = CreateConnectedGraph();
+
+            // Different weights so Maximum mode prefers the path with lower max arc cost
+            double Cost(Arc arc) => arc.Id switch
+            {
+                1 => 1.0,
+                2 => 5.0,
+                _ => 1.0
+            };
+
+            var path = BidirectionalDijkstraBuilder
+                .Create(graph)
+                .WithCost(Cost)
+                .WithMode(DijkstraMode.Maximum)
+                .From(new Node(1))
+                .To(new Node(3))
+                .Run();
+
+            path.Should().NotBeNull();
+            path!.Nodes().First().Should().Be(new Node(1));
+            path.Nodes().Last().Should().Be(new Node(3));
+        }
+
         #endregion
 
         #region Async API Tests
@@ -347,6 +388,48 @@ namespace Plate.ModernSatsuma.Test
 
             // Act & Assert
             dijkstra.Reached(new Node(4)).Should().BeFalse();
+        }
+
+        [Fact]
+        public void TryFindTwoEdgeDisjointShortestPathsOptimal_WithUnitCost_ShouldReturnTwoPaths()
+        {
+            var graph = new CustomGraph();
+            var s = graph.AddNode();
+            var a = graph.AddNode();
+            var b = graph.AddNode();
+            var t = graph.AddNode();
+
+            graph.AddArc(s, a, Directedness.Directed);
+            graph.AddArc(a, t, Directedness.Directed);
+            graph.AddArc(s, b, Directedness.Directed);
+            graph.AddArc(b, t, Directedness.Directed);
+
+            var result = graph.TryFindTwoEdgeDisjointShortestPathsOptimal(s, t, out var paths);
+
+            result.Should().BeTrue();
+            paths.Should().NotBeNull();
+            paths!.Count.Should().Be(2);
+
+            var p1Nodes = paths[0].Nodes().ToList();
+            var p2Nodes = paths[1].Nodes().ToList();
+
+            p1Nodes.First().Should().Be(s);
+            p1Nodes.Last().Should().Be(t);
+            p2Nodes.First().Should().Be(s);
+            p2Nodes.Last().Should().Be(t);
+        }
+
+        [Fact]
+        public void TryFindTwoEdgeDisjointShortestPathsOptimal_WithNoPath_ShouldReturnFalse()
+        {
+            var graph = CreateDisconnectedGraph();
+            var s = new Node(1);
+            var t = new Node(4);
+
+            var result = graph.TryFindTwoEdgeDisjointShortestPathsOptimal(s, t, out var paths);
+
+            result.Should().BeFalse();
+            paths.Should().BeNull();
         }
 
         #endregion
