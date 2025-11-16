@@ -82,7 +82,7 @@ modern-satsuma/
    - Updated project references with correct relative paths
    - Using central package management (no versions in project files)
    - Test project targets `net8.0` (modern .NET)
-   - Source project targets `netstandard2.0` (broad compatibility)
+   - Source project targets `netstandard2.1` (modern .NET Standard for core library)
 
 ## File Migrations
 
@@ -130,13 +130,15 @@ modern-satsuma/
 
 ## Build Status
 
-**Current**: ❌ Build fails (expected)
+**Current**: ✅ Core projects build successfully
 
-**Reason**: Known issues from analysis:
-1. Duplicate `IClearable` interface (Graph.cs + Utils.cs)
-2. System.Drawing dependencies in Drawing.cs
+**Reason (historical)**: Earlier modernization passes had:
+1. Duplicate `IClearable` interface (in both `Graph.cs` and `Utils.cs`).
+2. Direct System.Drawing dependencies in `Drawing.cs`.
 
-**Next Steps**: Follow the [Fix Action Plan](./docs/FIX_ACTION_PLAN.md) to resolve build issues.
+These issues have been resolved in the current layout by keeping `IClearable` only in `Graph.cs` and excluding `Drawing.cs` from the core project (drawing was extracted into separate renderer packages).
+
+**Next Steps**: See the [Fix Action Plan](../guides/FIX_ACTION_PLAN.md) and the modernization analysis for historical context and optional quality work.
 
 ## Verification
 

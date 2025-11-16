@@ -349,3 +349,55 @@ public sealed class AStarBuilder
 		return astar;
 	}
 }
+
+public sealed class BidirectionalDijkstraBuilder
+{
+	private readonly IGraph graph;
+	private Func<Arc, double> cost = _ => 1.0;
+	private DijkstraMode mode = DijkstraMode.Sum;
+	private Node source = Node.Invalid;
+	private Node target = Node.Invalid;
+
+	private BidirectionalDijkstraBuilder(IGraph graph)
+	{
+		if (graph == null) throw new ArgumentNullException(nameof(graph));
+		this.graph = graph;
+	}
+
+	public static BidirectionalDijkstraBuilder Create(IGraph graph)
+	{
+		return new BidirectionalDijkstraBuilder(graph);
+	}
+
+	public BidirectionalDijkstraBuilder WithCost(Func<Arc, double> costFunction)
+	{
+		cost = costFunction ?? throw new ArgumentNullException(nameof(costFunction));
+		return this;
+	}
+
+	public BidirectionalDijkstraBuilder WithMode(DijkstraMode dijkstraMode)
+	{
+		mode = dijkstraMode;
+		return this;
+	}
+
+	public BidirectionalDijkstraBuilder From(Node source)
+	{
+		this.source = source;
+		return this;
+	}
+
+	public BidirectionalDijkstraBuilder To(Node target)
+	{
+		this.target = target;
+		return this;
+	}
+
+	public IPath? Run()
+	{
+		if (source == Node.Invalid) throw new InvalidOperationException("Source node must be specified.");
+		if (target == Node.Invalid) throw new InvalidOperationException("Target node must be specified.");
+
+		return BidirectionalDijkstra.FindShortestPath(graph, source, target, cost, mode);
+	}
+}

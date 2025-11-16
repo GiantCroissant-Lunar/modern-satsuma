@@ -58,3 +58,5 @@ Thumbs.db
 .hub-cache/
 .agent
 .agent/
+
+ref-projects/

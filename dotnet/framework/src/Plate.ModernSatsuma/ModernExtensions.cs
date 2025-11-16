@@ -190,4 +190,45 @@ public static class ModernExtensions
 		parentArc = bellmanFord.GetParentArc(node);
 		return parentArc != Arc.Invalid;
 	}
+
+	public static bool TryFindTwoEdgeDisjointShortestPathsOptimal(
+		this IGraph graph,
+		Node source,
+		Node target,
+		Func<Arc, double> cost,
+		out IReadOnlyList<IPath>? paths,
+		DijkstraMode mode = DijkstraMode.Sum)
+	{
+		if (graph == null) throw new ArgumentNullException(nameof(graph));
+		if (cost == null) throw new ArgumentNullException(nameof(cost));
+
+		var result = DisjointPaths.FindTwoEdgeDisjointShortestPathsOptimal(graph, source, target, cost, mode);
+		if (result.Count == 0)
+		{
+			paths = null;
+			return false;
+		}
+
+		paths = result;
+		return true;
+	}
+
+	public static bool TryFindTwoEdgeDisjointShortestPathsOptimal(
+		this IGraph graph,
+		Node source,
+		Node target,
+		out IReadOnlyList<IPath>? paths)
+	{
+		if (graph == null) throw new ArgumentNullException(nameof(graph));
+
+		var result = DisjointPaths.FindTwoEdgeDisjointShortestPathsOptimal(graph, source, target);
+		if (result.Count == 0)
+		{
+			paths = null;
+			return false;
+		}
+
+		paths = result;
+		return true;
+	}
 }
