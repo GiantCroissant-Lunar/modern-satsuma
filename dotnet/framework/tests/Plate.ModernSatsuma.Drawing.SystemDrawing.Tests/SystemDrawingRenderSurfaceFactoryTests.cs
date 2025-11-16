@@ -1,9 +1,11 @@
 using FluentAssertions;
 using Plate.ModernSatsuma.Drawing.SystemDrawing;
+using System.Runtime.Versioning;
 using Xunit;
 
 namespace Plate.ModernSatsuma.Drawing.SystemDrawing.Tests
 {
+    [SupportedOSPlatform("windows")]
     public class SystemDrawingRenderSurfaceFactoryTests
     {
         private readonly SystemDrawingRenderSurfaceFactory _factory;

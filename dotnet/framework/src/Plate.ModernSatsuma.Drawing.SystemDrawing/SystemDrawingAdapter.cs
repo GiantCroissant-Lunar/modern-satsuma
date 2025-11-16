@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.Versioning;
 using Plate.ModernSatsuma.Abstractions;
 using SysColor = System.Drawing.Color;
 using SysPointF = System.Drawing.PointF;
@@ -14,6 +15,7 @@ namespace Plate.ModernSatsuma.Drawing.SystemDrawing
     /// <summary>
     /// System.Drawing implementation of IGraphicsContext.
     /// </summary>
+    [SupportedOSPlatform("windows")]
     public class SystemDrawingGraphicsContext : IGraphicsContext
     {
         private readonly Graphics _graphics;
@@ -210,6 +212,7 @@ namespace Plate.ModernSatsuma.Drawing.SystemDrawing
     /// <summary>
     /// System.Drawing implementation of IRenderSurface.
     /// </summary>
+    [SupportedOSPlatform("windows")]
     public class SystemDrawingRenderSurface : IRenderSurface
     {
         private readonly Bitmap _bitmap;
@@ -266,6 +269,7 @@ namespace Plate.ModernSatsuma.Drawing.SystemDrawing
     /// <summary>
     /// System.Drawing implementation of graphics factory.
     /// </summary>
+    [SupportedOSPlatform("windows")]
     public class SystemDrawingGraphicsFactory : IGraphicsFactory
     {
         public IPen CreatePen(AbsColor color, double width = 1.0, bool arrowCap = false)
@@ -292,6 +296,7 @@ namespace Plate.ModernSatsuma.Drawing.SystemDrawing
     /// <summary>
     /// System.Drawing implementation of render surface factory.
     /// </summary>
+    [SupportedOSPlatform("windows")]
     public class SystemDrawingRenderSurfaceFactory : IRenderSurfaceFactory
     {
         public IGraphicsFactory GraphicsFactory { get; }

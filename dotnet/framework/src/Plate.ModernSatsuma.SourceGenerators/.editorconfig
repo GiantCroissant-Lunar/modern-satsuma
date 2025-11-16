@@ -1,0 +1,3 @@
+[*.cs]
+# Source generator analyzer hygiene: treat RS2008 as suggestion (do not fail builds)
+dotnet_diagnostic.RS2008.severity = suggestion

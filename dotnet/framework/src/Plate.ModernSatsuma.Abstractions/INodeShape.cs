@@ -67,6 +67,6 @@ namespace Plate.ModernSatsuma.Abstractions
         /// <summary>
         /// Draws the node at the specified position with optional text.
         /// </summary>
-        void DrawNode(IGraphicsContext graphics, double x, double y, string text);
+        void DrawNode(IGraphicsContext graphics, double x, double y, string? text);
     }
 }
