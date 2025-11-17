@@ -11,17 +11,17 @@
 
 ### Rule Priority (Read in Order)
 
-1. **Workspace Rules** (highest priority) → `/Users/apprenticegc/Work/lunar-horse/.agent/local/overrides.md`
+1. **Workspace Rules** (highest priority) → `<workspace-root>/.agent/local/overrides.md` (if present)
 2. **Project Rules** → `.agent/local/overrides.md` (when created)
-3. **Stack Rules** (cached) → `~/.cache/lunar-rules/v1.0.0/stacks/dotnet/`
-4. **Base Rules** (cached) → `~/.cache/lunar-rules/v1.0.0/base/`
+3. **Stack Rules** (cached) → `~/.cache/lunar-rules/v1.0.0/stacks/dotnet/` (example POSIX path)
+4. **Base Rules** (cached) → `~/.cache/lunar-rules/v1.0.0/base/` (example POSIX path)
 
 ### Where to Find Rules
 
 ```
-Workspace Rules (ALL projects in lunar-horse)
-  Absolute: /Users/apprenticegc/Work/lunar-horse/.agent/local/overrides.md
-  Relative: ../../../.agent/local/overrides.md
+Workspace Rules (ALL projects in the workspace)
+  Location: <workspace-root>/.agent/local/overrides.md
+  Example (POSIX): /Users/.../.agent/local/overrides.md
   
 Project Rules (this project only)
   Location: .agent/local/overrides.md (create if needed)
