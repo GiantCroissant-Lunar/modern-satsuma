@@ -1,35 +1,35 @@
 # Claude Code Instructions - ModernSatsuma
 
 **Project**: Plate.ModernSatsuma  
-**Location**: `/Users/apprenticegc/Work/lunar-horse/personal-work/plate-projects/modern-satsuma`  
-**Workspace**: lunar-horse
+**Location (repo root)**: `<repo-root>`  
+**Workspace**: `<workspace-name>`
 
 ---
 
-## ⚠️ CRITICAL: Build Currently Broken
+## Build Status & Historical Fixes
 
-**DO NOT** attempt to build until fixing these issues:
+Core projects currently build successfully (see `AGENTS.md` and `docs/status/MODERNIZATION_COMPLETE.md`).
+The issues below are **historical** build blockers and must remain fixed:
 
 1. **Duplicate IClearable Interface** (CS0101)
    - File 1: `dotnet/framework/src/Plate.ModernSatsuma/Graph.cs` (lines 138-141)
    - File 2: `dotnet/framework/src/Plate.ModernSatsuma/Utils.cs` (lines 12-17)
-   - **Fix**: Delete from Utils.cs, keep in Graph.cs
+   - **Fix (already applied)**: Delete from Utils.cs, keep in Graph.cs
 
 2. **Drawing.cs Dependencies** (CS0234/CS0246)
    - File: `dotnet/framework/src/Plate.ModernSatsuma/Drawing.cs`
    - Problem: System.Drawing not available in .NET Standard 2.0
-   - **Quick Fix**: Rename to `Drawing.cs.DISABLED`
-   - **Full Fix**: Add System.Drawing.Common package (deprecated) or rewrite with SkiaSharp
+   - **Current state**: `Drawing.cs` is excluded from the core build; drawing is provided by dedicated renderer packages.
 
-See `docs/FIX_ACTION_PLAN.md` for step-by-step resolution.
+See `docs/FIX_ACTION_PLAN.md` for the historical step-by-step resolution.
 
 ---
 
 ## Quick Start
 
 ### Workspace Rules
-**Location**: `/Users/apprenticegc/Work/lunar-horse/.agent/local/overrides.md`  
-**READ THIS FIRST** - Contains rules for ALL projects in lunar-horse workspace
+**Location**: `<workspace-root>/.agent/local/overrides.md` (if present)  
+**READ THIS FIRST** - Contains rules for ALL projects in the workspace
 
 ### Project Structure
 
@@ -47,16 +47,11 @@ modern-satsuma/
 ### Build Commands
 
 ```bash
-# Navigate to solution
-cd /Users/apprenticegc/Work/lunar-horse/personal-work/plate-projects/modern-satsuma/dotnet/framework
+# From repo root
+cd dotnet/framework
 
-# Restore (works)
 dotnet restore
-
-# Build (FAILS - see issues above)
 dotnet build
-
-# Test (after build is fixed)
 dotnet test
 ```
 
@@ -174,20 +169,20 @@ See `docs/FIX_ACTION_PLAN.md` for detailed steps.
 
 **Quick version**:
 ```bash
-cd /Users/apprenticegc/Work/lunar-horse/personal-work/plate-projects/modern-satsuma
+cd <repo-root>
 
-# Fix 1: Remove duplicate IClearable from Utils.cs
+# Historical Fix 1: Remove duplicate IClearable from Utils.cs
 # Edit dotnet/framework/src/Plate.ModernSatsuma/Utils.cs
 # Delete lines 12-17
 
-# Fix 2: Disable Drawing.cs
-mv dotnet/framework/src/Plate.ModernSatsuma/Drawing.cs \
-   dotnet/framework/src/Plate.ModernSatsuma/Drawing.cs.DISABLED
+# Historical Fix 2: Disable Drawing.cs
+# mv dotnet/framework/src/Plate.ModernSatsuma/Drawing.cs \
+#    dotnet/framework/src/Plate.ModernSatsuma/Drawing.cs.DISABLED
 
 # Test build
 cd dotnet/framework
 dotnet clean
-dotnet build  # Should now succeed
+dotnet build
 ```
 
 ### Task: Add New Algorithm
@@ -241,7 +236,7 @@ Or let pre-commit hooks handle it automatically.
 
 ### DO ✅
 
-- Read workspace rules first: `/Users/apprenticegc/Work/lunar-horse/.agent/local/overrides.md`
+- Read workspace rules first (if available): `<workspace-root>/.agent/local/overrides.md`
 - Use `Plate.ModernSatsuma` namespace
 - Target .NET Standard 2.0 for library code
 - Add XML documentation to public APIs
@@ -274,8 +269,8 @@ Or let pre-commit hooks handle it automatically.
 
 When working in this project:
 
-1. **ALWAYS** check if build is fixed before attempting operations
-2. **ALWAYS** use full paths: `/Users/apprenticegc/Work/lunar-horse/personal-work/plate-projects/modern-satsuma/...`
+1. **ALWAYS** keep the build green before attempting large refactors
+2. **ALWAYS** use paths relative to `<repo-root>`, e.g. `dotnet/framework/...`
 3. **ALWAYS** cd to `dotnet/framework` before dotnet commands
 4. **READ** `docs/FIX_ACTION_PLAN.md` before fixing build issues
 5. **REFER** to original at `winged-bean/ref-projects/satsumagraph-code` when unsure
@@ -285,10 +280,10 @@ When working in this project:
 
 ## Version Information
 
-**Current Status**: v0.1.0-alpha (pre-release, build broken)  
-**Last Updated**: 2025-10-14  
-**Next Milestone**: Fix build issues, reach v0.1.0-alpha (buildable)
+**Current Status**: v0.1.0-alpha (pre-release, core projects build)  
+**Last Updated**: 2025-11-17  
+**Next Milestone**: Expand tests/benchmarks and complete remaining quality improvements
 
 ---
 
-**Read the workspace rules**: `/Users/apprenticegc/Work/lunar-horse/.agent/local/overrides.md`
+**Read the workspace rules**: `<workspace-root>/.agent/local/overrides.md`

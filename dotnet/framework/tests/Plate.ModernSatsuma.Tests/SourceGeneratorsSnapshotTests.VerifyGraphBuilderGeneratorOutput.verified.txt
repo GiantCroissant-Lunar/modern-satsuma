@@ -1,0 +1,41 @@
+﻿// HintName: SnapshotGraph.GraphBuilder.g.cs
+namespace Sample;
+
+public partial class SnapshotGraph
+{
+    private readonly global::System.Collections.Generic.Dictionary<global::Plate.ModernSatsuma.Arc, double> _graphBuilderArcCosts = new global::System.Collections.Generic.Dictionary<global::Plate.ModernSatsuma.Arc, double>();
+    private readonly global::System.Collections.Generic.Dictionary<string, global::System.Collections.Generic.Dictionary<global::Plate.ModernSatsuma.Arc, double>> _graphBuilderNamedArcCosts = new global::System.Collections.Generic.Dictionary<string, global::System.Collections.Generic.Dictionary<global::Plate.ModernSatsuma.Arc, double>>();
+    private readonly global::System.Collections.Generic.Dictionary<global::Plate.ModernSatsuma.Arc, string> _graphBuilderArcTags = new global::System.Collections.Generic.Dictionary<global::Plate.ModernSatsuma.Arc, string>();
+
+    public global::System.Func<global::Plate.ModernSatsuma.Arc, double> CreateCostFunction(double defaultCost = 1.0)
+    {
+        return arc => _graphBuilderArcCosts.TryGetValue(arc, out var cost) ? cost : defaultCost;
+    }
+
+    public global::System.Func<global::Plate.ModernSatsuma.Arc, double> CreateCostFunction(string weightName, double defaultCost = 1.0)
+    {
+        if (weightName is null) throw new global::System.ArgumentNullException(nameof(weightName));
+        return arc => _graphBuilderNamedArcCosts.TryGetValue(weightName, out var weights) && weights.TryGetValue(arc, out var cost) ? cost : defaultCost;
+    }
+
+    public global::System.Func<global::Plate.ModernSatsuma.Arc, string?> CreateTagLookup()
+    {
+        return arc => _graphBuilderArcTags.TryGetValue(arc, out var tag) ? tag : null;
+    }
+
+    public global::Plate.ModernSatsuma.CustomGraph BuildGraph()
+    {
+        var graph = new global::Plate.ModernSatsuma.CustomGraph();
+        _graphBuilderArcCosts.Clear();
+        _graphBuilderNamedArcCosts.Clear();
+        _graphBuilderArcTags.Clear();
+        global::Plate.ModernSatsuma.Arc arc;
+        A = graph.AddNode();
+        B = graph.AddNode();
+        graph.AddArc(A, B, global::Plate.ModernSatsuma.Directedness.Directed);
+        return graph;
+    }
+}
+
+
+
