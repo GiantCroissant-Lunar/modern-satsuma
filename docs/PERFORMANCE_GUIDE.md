@@ -1,3 +1,14 @@
+---
+doc_id: 'GUIDE-10102'
+title: 'Performance Guide - Plate.ModernSatsuma'
+doc_type: 'guide'
+status: 'active'
+canonical: true
+created: '2025-10-22'
+tags: ['dotnet', 'modern-satsuma', 'performance', 'graph-algorithms', 'guide']
+summary: 'Performance tuning guide and API usage patterns for the Plate.ModernSatsuma graph library.'
+---
+
 # Performance Guide - Plate.ModernSatsuma
 
 This guide helps you choose the right API for your performance requirements.

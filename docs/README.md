@@ -1,3 +1,14 @@
+---
+doc_id: 'REFERENCE-10101'
+title: 'Modern Satsuma Documentation'
+doc_type: 'reference'
+status: 'active'
+canonical: true
+created: '2025-10-22'
+tags: ['dotnet', 'modern-satsuma', 'documentation', 'reference']
+summary: 'Index and overview of documentation for the Plate.ModernSatsuma graph library.'
+---
+
 # Modern Satsuma Documentation
 
 This directory contains comprehensive documentation for the Modern Satsuma graph library project.
