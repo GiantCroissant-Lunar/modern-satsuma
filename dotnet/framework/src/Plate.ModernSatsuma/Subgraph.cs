@@ -17,152 +17,152 @@ namespace Plate.ModernSatsuma;
 /// \sa Supergraph
 public sealed class Subgraph : IGraph
 {
-	private IGraph graph;
+    private IGraph graph;
 
-	private bool defaultNodeEnabled;
-	private HashSet<Node> nodeExceptions = new();
-	private bool defaultArcEnabled;
-	private HashSet<Arc> arcExceptions = new();
+    private bool defaultNodeEnabled;
+    private HashSet<Node> nodeExceptions = new();
+    private bool defaultArcEnabled;
+    private HashSet<Arc> arcExceptions = new();
 
-	public Subgraph(IGraph graph)
-	{
-		this.graph = graph;
+    public Subgraph(IGraph graph)
+    {
+        this.graph = graph;
 
-		EnableAllNodes(true);
-		EnableAllArcs(true);
-	}
+        EnableAllNodes(true);
+        EnableAllArcs(true);
+    }
 
-	/// Enables/disables all nodes at once.
-	/// \param enabled \c true if all nodes should be enabled, \c false if all nodes should be disabled.
-	public void EnableAllNodes(bool enabled)
-	{
-		defaultNodeEnabled = enabled;
-		nodeExceptions.Clear();
-	}
+    /// Enables/disables all nodes at once.
+    /// \param enabled \c true if all nodes should be enabled, \c false if all nodes should be disabled.
+    public void EnableAllNodes(bool enabled)
+    {
+        defaultNodeEnabled = enabled;
+        nodeExceptions.Clear();
+    }
 
-	/// Enables/disables all arcs at once.
-	/// \param enabled \c true if all arcs should be enabled, \c false if all arcs should be disabled.
-	public void EnableAllArcs(bool enabled)
-	{
-		defaultArcEnabled = enabled;
-		arcExceptions.Clear();
-	}
+    /// Enables/disables all arcs at once.
+    /// \param enabled \c true if all arcs should be enabled, \c false if all arcs should be disabled.
+    public void EnableAllArcs(bool enabled)
+    {
+        defaultArcEnabled = enabled;
+        arcExceptions.Clear();
+    }
 
-	/// Enables/disables a single node.
-	/// \param enabled \c true if the node should be enabled, \c false if the node should be disabled.
-	public void Enable(Node node, bool enabled)
-	{
-		bool exception = (defaultNodeEnabled != enabled);
-		if (exception)
-			nodeExceptions.Add(node);
-		else nodeExceptions.Remove(node);
-	}
+    /// Enables/disables a single node.
+    /// \param enabled \c true if the node should be enabled, \c false if the node should be disabled.
+    public void Enable(Node node, bool enabled)
+    {
+        bool exception = (defaultNodeEnabled != enabled);
+        if (exception)
+            nodeExceptions.Add(node);
+        else nodeExceptions.Remove(node);
+    }
 
-	/// Enables/disables a single arc.
-	/// \param enabled \c true if the arc should be enabled, \c false if the arc should be disabled.
-	public void Enable(Arc arc, bool enabled)
-	{
-		bool exception = (defaultArcEnabled != enabled);
-		if (exception)
-			arcExceptions.Add(arc);
-		else arcExceptions.Remove(arc);
-	}
+    /// Enables/disables a single arc.
+    /// \param enabled \c true if the arc should be enabled, \c false if the arc should be disabled.
+    public void Enable(Arc arc, bool enabled)
+    {
+        bool exception = (defaultArcEnabled != enabled);
+        if (exception)
+            arcExceptions.Add(arc);
+        else arcExceptions.Remove(arc);
+    }
 
-	/// Queries the enabledness of a node.
-	public bool IsEnabled(Node node)
-	{
-		return defaultNodeEnabled ^ nodeExceptions.Contains(node);
-	}
+    /// Queries the enabledness of a node.
+    public bool IsEnabled(Node node)
+    {
+        return defaultNodeEnabled ^ nodeExceptions.Contains(node);
+    }
 
-	/// Queries the enabledness of an arc.
-	public bool IsEnabled(Arc arc)
-	{
-		return defaultArcEnabled ^ arcExceptions.Contains(arc);
-	}
+    /// Queries the enabledness of an arc.
+    public bool IsEnabled(Arc arc)
+    {
+        return defaultArcEnabled ^ arcExceptions.Contains(arc);
+    }
 
-	public Node U(Arc arc)
-	{
-		return graph.U(arc);
-	}
+    public Node U(Arc arc)
+    {
+        return graph.U(arc);
+    }
 
-	public Node V(Arc arc)
-	{
-		return graph.V(arc);
-	}
+    public Node V(Arc arc)
+    {
+        return graph.V(arc);
+    }
 
-	public bool IsEdge(Arc arc)
-	{
-		return graph.IsEdge(arc);
-	}
+    public bool IsEdge(Arc arc)
+    {
+        return graph.IsEdge(arc);
+    }
 
-	private IEnumerable<Node> NodesInternal()
-	{
-		foreach (var node in graph.Nodes())
-			if (IsEnabled(node)) yield return node;
-	}
+    private IEnumerable<Node> NodesInternal()
+    {
+        foreach (var node in graph.Nodes())
+            if (IsEnabled(node)) yield return node;
+    }
 
-	public IEnumerable<Node> Nodes()
-	{
-		if (nodeExceptions.Count == 0)
-		{
-			if (defaultNodeEnabled) return graph.Nodes();
-			return Enumerable.Empty<Node>();
-		}
-		return NodesInternal();
-	}
+    public IEnumerable<Node> Nodes()
+    {
+        if (nodeExceptions.Count == 0)
+        {
+            if (defaultNodeEnabled) return graph.Nodes();
+            return Enumerable.Empty<Node>();
+        }
+        return NodesInternal();
+    }
 
-	public IEnumerable<Arc> Arcs(ArcFilter filter = ArcFilter.All)
-	{
-		foreach (var arc in graph.Arcs(filter))
-			if (IsEnabled(arc) && IsEnabled(graph.U(arc)) && IsEnabled(graph.V(arc))) yield return arc;
-	}
+    public IEnumerable<Arc> Arcs(ArcFilter filter = ArcFilter.All)
+    {
+        foreach (var arc in graph.Arcs(filter))
+            if (IsEnabled(arc) && IsEnabled(graph.U(arc)) && IsEnabled(graph.V(arc))) yield return arc;
+    }
 
-	public IEnumerable<Arc> Arcs(Node u, ArcFilter filter = ArcFilter.All)
-	{
-		if (!IsEnabled(u)) yield break;
-		foreach (var arc in graph.Arcs(u, filter))
-			if (IsEnabled(arc) && IsEnabled(graph.Other(arc, u))) yield return arc;
-	}
+    public IEnumerable<Arc> Arcs(Node u, ArcFilter filter = ArcFilter.All)
+    {
+        if (!IsEnabled(u)) yield break;
+        foreach (var arc in graph.Arcs(u, filter))
+            if (IsEnabled(arc) && IsEnabled(graph.Other(arc, u))) yield return arc;
+    }
 
-	public IEnumerable<Arc> Arcs(Node u, Node v, ArcFilter filter = ArcFilter.All)
-	{
-		if (!IsEnabled(u) || !IsEnabled(v)) yield break;
-		foreach (var arc in graph.Arcs(u, v, filter))
-			if (IsEnabled(arc)) yield return arc;
-	}
+    public IEnumerable<Arc> Arcs(Node u, Node v, ArcFilter filter = ArcFilter.All)
+    {
+        if (!IsEnabled(u) || !IsEnabled(v)) yield break;
+        foreach (var arc in graph.Arcs(u, v, filter))
+            if (IsEnabled(arc)) yield return arc;
+    }
 
-	public int NodeCount()
-	{
-		return defaultNodeEnabled ? graph.NodeCount() - nodeExceptions.Count : nodeExceptions.Count;
-	}
+    public int NodeCount()
+    {
+        return defaultNodeEnabled ? graph.NodeCount() - nodeExceptions.Count : nodeExceptions.Count;
+    }
 
-	public int ArcCount(ArcFilter filter = ArcFilter.All)
-	{
-		if (nodeExceptions.Count == 0 && filter == ArcFilter.All)
-			return defaultNodeEnabled ?
-				(defaultArcEnabled ? graph.ArcCount() - arcExceptions.Count : arcExceptions.Count)
-				: 0;
+    public int ArcCount(ArcFilter filter = ArcFilter.All)
+    {
+        if (nodeExceptions.Count == 0 && filter == ArcFilter.All)
+            return defaultNodeEnabled ?
+                (defaultArcEnabled ? graph.ArcCount() - arcExceptions.Count : arcExceptions.Count)
+                : 0;
 
-		return Arcs(filter).Count();
-	}
+        return Arcs(filter).Count();
+    }
 
-	public int ArcCount(Node u, ArcFilter filter = ArcFilter.All)
-	{
-		return Arcs(u, filter).Count();
-	}
+    public int ArcCount(Node u, ArcFilter filter = ArcFilter.All)
+    {
+        return Arcs(u, filter).Count();
+    }
 
-	public int ArcCount(Node u, Node v, ArcFilter filter = ArcFilter.All)
-	{
-		return Arcs(u, v, filter).Count();
-	}
+    public int ArcCount(Node u, Node v, ArcFilter filter = ArcFilter.All)
+    {
+        return Arcs(u, v, filter).Count();
+    }
 
-	public bool HasNode(Node node)
-	{
-		return graph.HasNode(node) && IsEnabled(node);
-	}
+    public bool HasNode(Node node)
+    {
+        return graph.HasNode(node) && IsEnabled(node);
+    }
 
-	public bool HasArc(Arc arc)
-	{
-		return graph.HasArc(arc) && IsEnabled(arc);
-	}
+    public bool HasArc(Arc arc)
+    {
+        return graph.HasArc(arc) && IsEnabled(arc);
+    }
 }

@@ -24,7 +24,7 @@ namespace Plate.ModernSatsuma
         public static bool operator !=(PointD a, PointD b) => !(a == b);
         public override int GetHashCode() => HashCode.Combine(X, Y);
 
-        public string ToString(IFormatProvider provider) => 
+        public string ToString(IFormatProvider provider) =>
             string.Format(provider, "({0} {1})", X, Y);
 
         public override string ToString() => ToString(CultureInfo.CurrentCulture);

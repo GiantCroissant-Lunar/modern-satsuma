@@ -33,99 +33,99 @@ namespace Plate.ModernSatsuma;
 /// \sa BellmanFord, Bfs, Dijkstra
 public sealed class AStar
 {
-	/// The input graph.
-	public IGraph Graph { get; private set; }
-	/// A non-negative arc cost function.
-	public Func<Arc, double> Cost { get; private set; }
-	/// The A* heuristic function.
-	/// #Heuristic \b must be a function that is
-	/// - <b>non-negative</b>,
-	/// - \b admissible: it must assign for each node a <b>lower bound</b> on the
-	/// cost of the cheapest path from the given node to the target node set,
-	/// - and \b consistent: for each \e uv arc, <tt>Heuristic(u) &lt;= Cost(uv) + Heuristic(v)</tt>.
-	///
-	/// From the above it follows that #Heuristic must return 0 for all target nodes.
-	///
-	/// If #Heuristic is the constant zero function,
-	/// then the algorithm is equivalent to Dijkstra's algorithm.
-	public Func<Node, double> Heuristic { get; private set; }
+    /// The input graph.
+    public IGraph Graph { get; private set; }
+    /// A non-negative arc cost function.
+    public Func<Arc, double> Cost { get; private set; }
+    /// The A* heuristic function.
+    /// #Heuristic \b must be a function that is
+    /// - <b>non-negative</b>,
+    /// - \b admissible: it must assign for each node a <b>lower bound</b> on the
+    /// cost of the cheapest path from the given node to the target node set,
+    /// - and \b consistent: for each \e uv arc, <tt>Heuristic(u) &lt;= Cost(uv) + Heuristic(v)</tt>.
+    ///
+    /// From the above it follows that #Heuristic must return 0 for all target nodes.
+    ///
+    /// If #Heuristic is the constant zero function,
+    /// then the algorithm is equivalent to Dijkstra's algorithm.
+    public Func<Node, double> Heuristic { get; private set; }
 
-	private Dijkstra dijkstra;
+    private Dijkstra dijkstra;
 
-	/// \param graph See #Graph.
-	/// \param cost See #Cost.
-	/// \param heuristic See #Heuristic.
-	public AStar(IGraph graph, Func<Arc, double> cost, Func<Node, double> heuristic)
-	{
-		Graph = graph;
-		Cost = cost;
-		Heuristic = heuristic;
+    /// \param graph See #Graph.
+    /// \param cost See #Cost.
+    /// \param heuristic See #Heuristic.
+    public AStar(IGraph graph, Func<Arc, double> cost, Func<Node, double> heuristic)
+    {
+        Graph = graph;
+        Cost = cost;
+        Heuristic = heuristic;
 
-		dijkstra = new Dijkstra(Graph, arc => Cost(arc) - Heuristic(Graph.U(arc)) + Heuristic(Graph.V(arc)),
-			DijkstraMode.Sum);
-	}
+        dijkstra = new Dijkstra(Graph, arc => Cost(arc) - Heuristic(Graph.U(arc)) + Heuristic(Graph.V(arc)),
+            DijkstraMode.Sum);
+    }
 
-	private Node CheckTarget(Node node)
-	{
-		if (node != Node.Invalid && Heuristic(node) != 0)
-			throw new ArgumentException("Heuristic is nonzero for a target");
-		return node;
-	}
+    private Node CheckTarget(Node node)
+    {
+        if (node != Node.Invalid && Heuristic(node) != 0)
+            throw new ArgumentException("Heuristic is nonzero for a target");
+        return node;
+    }
 
-	/// Adds a new source node.
-	/// \exception InvalidOperationException The node has already been reached.
-	public void AddSource(Node node)
-	{
-		dijkstra.AddSource(node, Heuristic(node));
-	}
+    /// Adds a new source node.
+    /// \exception InvalidOperationException The node has already been reached.
+    public void AddSource(Node node)
+    {
+        dijkstra.AddSource(node, Heuristic(node));
+    }
 
-	/// Runs the algorithm until the given node is reached.
-	/// \param target The node to reach.
-	/// \return \e target if it was successfully reached, or Node.Invalid if it is unreachable.
-	/// \exception ArgumentException <tt>Heuristic(target)</tt> is not 0.
-	public Node RunUntilReached(Node target)
-	{
-		return CheckTarget(dijkstra.RunUntilFixed(target));
-	}
+    /// Runs the algorithm until the given node is reached.
+    /// \param target The node to reach.
+    /// \return \e target if it was successfully reached, or Node.Invalid if it is unreachable.
+    /// \exception ArgumentException <tt>Heuristic(target)</tt> is not 0.
+    public Node RunUntilReached(Node target)
+    {
+        return CheckTarget(dijkstra.RunUntilFixed(target));
+    }
 
-	/// Runs the algorithm until a node satisfying the given condition is reached.
-	/// \return a target node if one was successfully reached, or Node.Invalid if all the targets are unreachable.
-	/// \exception ArgumentException <tt>Heuristic</tt> is not 0 for the returned node.
-	public Node RunUntilReached(Func<Node, bool> isTarget)
-	{
-		return CheckTarget(dijkstra.RunUntilFixed(isTarget));
-	}
+    /// Runs the algorithm until a node satisfying the given condition is reached.
+    /// \return a target node if one was successfully reached, or Node.Invalid if all the targets are unreachable.
+    /// \exception ArgumentException <tt>Heuristic</tt> is not 0 for the returned node.
+    public Node RunUntilReached(Func<Node, bool> isTarget)
+    {
+        return CheckTarget(dijkstra.RunUntilFixed(isTarget));
+    }
 
-	/// Gets the cost of the cheapest path from the source nodes to a given node
-	/// (that is, its distance from the sources).
-	/// \return The distance, or <tt>double.PositiveInfinity</tt> if the node has not been reached yet.
-	/// \exception ArgumentException <tt>Heuristic(node)</tt> is not 0.
-	public double GetDistance(Node node)
-	{
-		CheckTarget(node);
-		return dijkstra.Fixed(node) ? dijkstra.GetDistance(node) : double.PositiveInfinity;
-	}
+    /// Gets the cost of the cheapest path from the source nodes to a given node
+    /// (that is, its distance from the sources).
+    /// \return The distance, or <tt>double.PositiveInfinity</tt> if the node has not been reached yet.
+    /// \exception ArgumentException <tt>Heuristic(node)</tt> is not 0.
+    public double GetDistance(Node node)
+    {
+        CheckTarget(node);
+        return dijkstra.Fixed(node) ? dijkstra.GetDistance(node) : double.PositiveInfinity;
+    }
 
-	/// Gets a cheapest path from the source nodes to a given node.
-	/// \return A cheapest path, or null if the node has not been reached yet.
-	/// \exception ArgumentException <tt>Heuristic(node)</tt> is not 0.
-	public IPath? GetPath(Node node)
-	{
-		CheckTarget(node);
-		if (!dijkstra.Fixed(node)) return null;
-		return dijkstra.GetPath(node);
-	}
+    /// Gets a cheapest path from the source nodes to a given node.
+    /// \return A cheapest path, or null if the node has not been reached yet.
+    /// \exception ArgumentException <tt>Heuristic(node)</tt> is not 0.
+    public IPath? GetPath(Node node)
+    {
+        CheckTarget(node);
+        if (!dijkstra.Fixed(node)) return null;
+        return dijkstra.GetPath(node);
+    }
 
-	/// <summary>
-	/// Attempts to get a cheapest path from the source nodes to a given node.
-	/// </summary>
-	/// <param name="node">The target node.</param>
-	/// <param name="path">The path if the node has been reached, null otherwise.</param>
-	/// <returns>True if the node has been reached, false otherwise.</returns>
-	/// <exception cref="ArgumentException">Heuristic(node) is not 0.</exception>
-	public bool TryGetPath(Node node, out IPath? path)
-	{
-		path = GetPath(node);
-		return path != null;
-	}
+    /// <summary>
+    /// Attempts to get a cheapest path from the source nodes to a given node.
+    /// </summary>
+    /// <param name="node">The target node.</param>
+    /// <param name="path">The path if the node has been reached, null otherwise.</param>
+    /// <returns>True if the node has been reached, false otherwise.</returns>
+    /// <exception cref="ArgumentException">Heuristic(node) is not 0.</exception>
+    public bool TryGetPath(Node node, out IPath? path)
+    {
+        path = GetPath(node);
+        return path != null;
+    }
 }

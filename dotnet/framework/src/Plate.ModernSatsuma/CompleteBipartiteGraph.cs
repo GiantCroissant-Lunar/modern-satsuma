@@ -15,178 +15,178 @@ namespace Plate.ModernSatsuma;
 /// \sa CompleteGraph
 public sealed class CompleteBipartiteGraph : IGraph
 {
-	/// The color of a node.
-	public enum Color
-	{
-		Red, 
-		Blue
-	}
+    /// The color of a node.
+    public enum Color
+    {
+        Red,
+        Blue
+    }
 
-	/// The count of nodes in the first color class.
-	public int RedNodeCount { get; private set; }
-	/// The count of nodes in the second color class.
-	public int BlueNodeCount { get; private set; }
-	/// \c true if the graph is directed from red to blue nodes, 
-	/// \c false if it is undirected.
-	public bool Directed { get; private set; }
+    /// The count of nodes in the first color class.
+    public int RedNodeCount { get; private set; }
+    /// The count of nodes in the second color class.
+    public int BlueNodeCount { get; private set; }
+    /// \c true if the graph is directed from red to blue nodes, 
+    /// \c false if it is undirected.
+    public bool Directed { get; private set; }
 
-	/// Creates a complete bipartite graph.
-	/// \param directedness If Directedness.Directed, then the graph is directed from the red to the blue nodes.
-	/// Otherwise, the graph is undirected.
-	public CompleteBipartiteGraph(int redNodeCount, int blueNodeCount, Directedness directedness)
-	{
-		if (redNodeCount < 0 || blueNodeCount < 0)
-			throw new ArgumentException("Invalid node count: " + redNodeCount + ";" + blueNodeCount);
-		if ((long)redNodeCount + blueNodeCount > int.MaxValue ||
-			(long)redNodeCount * blueNodeCount > int.MaxValue)
-			throw new ArgumentException("Too many nodes: " + redNodeCount + ";" + blueNodeCount);
+    /// Creates a complete bipartite graph.
+    /// \param directedness If Directedness.Directed, then the graph is directed from the red to the blue nodes.
+    /// Otherwise, the graph is undirected.
+    public CompleteBipartiteGraph(int redNodeCount, int blueNodeCount, Directedness directedness)
+    {
+        if (redNodeCount < 0 || blueNodeCount < 0)
+            throw new ArgumentException("Invalid node count: " + redNodeCount + ";" + blueNodeCount);
+        if ((long)redNodeCount + blueNodeCount > int.MaxValue ||
+            (long)redNodeCount * blueNodeCount > int.MaxValue)
+            throw new ArgumentException("Too many nodes: " + redNodeCount + ";" + blueNodeCount);
 
-		RedNodeCount = redNodeCount;
-		BlueNodeCount = blueNodeCount;
-		Directed = (directedness == Directedness.Directed);
-	}
-	
-	/// Gets a red node by its index.
-	/// \param index An integer between 0 (inclusive) and RedNodeCount (exclusive).
-	public Node GetRedNode(int index) => new Node(1L + index);
+        RedNodeCount = redNodeCount;
+        BlueNodeCount = blueNodeCount;
+        Directed = (directedness == Directedness.Directed);
+    }
 
-	/// Gets a blue node by its index.
-	/// \param index An integer between 0 (inclusive) and BlueNodeCount (exclusive).
-	public Node GetBlueNode(int index) => new Node(1L + RedNodeCount + index);
+    /// Gets a red node by its index.
+    /// \param index An integer between 0 (inclusive) and RedNodeCount (exclusive).
+    public Node GetRedNode(int index) => new Node(1L + index);
 
-	public bool IsRed(Node node) => node.Id <= RedNodeCount;
+    /// Gets a blue node by its index.
+    /// \param index An integer between 0 (inclusive) and BlueNodeCount (exclusive).
+    public Node GetBlueNode(int index) => new Node(1L + RedNodeCount + index);
 
-	/// Gets the unique arc between two nodes.
-	/// \param u The first node.
-	/// \param v The second node.
-	/// \return The arc whose two ends are \e u and \e v, or Arc.Invalid if the two nodes are of the same color.
-	public Arc GetArc(Node u, Node v)
-	{
-		bool ured = IsRed(u);
-		bool vred = IsRed(v);
+    public bool IsRed(Node node) => node.Id <= RedNodeCount;
 
-		if (ured == vred) return Arc.Invalid;
-		if (vred)
-		{
-			var t = u; u = v; v = t;
-		}
+    /// Gets the unique arc between two nodes.
+    /// \param u The first node.
+    /// \param v The second node.
+    /// \return The arc whose two ends are \e u and \e v, or Arc.Invalid if the two nodes are of the same color.
+    public Arc GetArc(Node u, Node v)
+    {
+        bool ured = IsRed(u);
+        bool vred = IsRed(v);
 
-		int uindex = (int)(u.Id - 1);
-		int vindex = (int)(v.Id - RedNodeCount - 1);
+        if (ured == vred) return Arc.Invalid;
+        if (vred)
+        {
+            var t = u; u = v; v = t;
+        }
 
-		return new Arc(1 + (long)vindex * RedNodeCount + uindex);
-	}
+        int uindex = (int)(u.Id - 1);
+        int vindex = (int)(v.Id - RedNodeCount - 1);
 
-	/// Returns the red node of an arc.
-	public Node U(Arc arc)
-	{
-		return new Node(1L + (arc.Id - 1) % RedNodeCount);
-	}
+        return new Arc(1 + (long)vindex * RedNodeCount + uindex);
+    }
 
-	/// Returns the blue node of an arc.
-	public Node V(Arc arc)
-	{
-		return new Node(1L + RedNodeCount + (arc.Id - 1) / RedNodeCount);
-	}
+    /// Returns the red node of an arc.
+    public Node U(Arc arc)
+    {
+        return new Node(1L + (arc.Id - 1) % RedNodeCount);
+    }
 
-	public bool IsEdge(Arc arc)
-	{
-		return !Directed;
-	}
+    /// Returns the blue node of an arc.
+    public Node V(Arc arc)
+    {
+        return new Node(1L + RedNodeCount + (arc.Id - 1) / RedNodeCount);
+    }
 
-	/// Gets all nodes of a given color.
-	public IEnumerable<Node> Nodes(Color color)
-	{
-		switch (color)
-		{
-			case Color.Red:
-				for (int i = 0; i < RedNodeCount; i++)
-					yield return GetRedNode(i);
-				break;
+    public bool IsEdge(Arc arc)
+    {
+        return !Directed;
+    }
 
-			case Color.Blue:
-				for (int i = 0; i < BlueNodeCount; i++)
-					yield return GetBlueNode(i);
-				break;
-		}
-	}
+    /// Gets all nodes of a given color.
+    public IEnumerable<Node> Nodes(Color color)
+    {
+        switch (color)
+        {
+            case Color.Red:
+                for (int i = 0; i < RedNodeCount; i++)
+                    yield return GetRedNode(i);
+                break;
 
-	public IEnumerable<Node> Nodes()
-	{
-		for (int i = 0; i < RedNodeCount; i++)
-			yield return GetRedNode(i);
-		for (int i = 0; i < BlueNodeCount; i++)
-			yield return GetBlueNode(i);
-	}
+            case Color.Blue:
+                for (int i = 0; i < BlueNodeCount; i++)
+                    yield return GetBlueNode(i);
+                break;
+        }
+    }
 
-	public IEnumerable<Arc> Arcs(ArcFilter filter = ArcFilter.All)
-	{
-		if (Directed && filter == ArcFilter.Edge) yield break;
+    public IEnumerable<Node> Nodes()
+    {
+        for (int i = 0; i < RedNodeCount; i++)
+            yield return GetRedNode(i);
+        for (int i = 0; i < BlueNodeCount; i++)
+            yield return GetBlueNode(i);
+    }
 
-		for (int i = 0; i < RedNodeCount; i++)
-			for (int j = 0; j < BlueNodeCount; j++)
-				yield return GetArc(GetRedNode(i), GetBlueNode(j));
-	}
+    public IEnumerable<Arc> Arcs(ArcFilter filter = ArcFilter.All)
+    {
+        if (Directed && filter == ArcFilter.Edge) yield break;
 
-	public IEnumerable<Arc> Arcs(Node u, ArcFilter filter = ArcFilter.All)
-	{
-		bool isRed = IsRed(u);
-		if (Directed && (filter == ArcFilter.Edge ||
-			(filter == ArcFilter.Forward && !isRed) ||
-			(filter == ArcFilter.Backward && isRed))) yield break;
+        for (int i = 0; i < RedNodeCount; i++)
+            for (int j = 0; j < BlueNodeCount; j++)
+                yield return GetArc(GetRedNode(i), GetBlueNode(j));
+    }
 
-		if (isRed)
-		{
-			for (int i = 0; i < BlueNodeCount; i++)
-				yield return GetArc(u, GetBlueNode(i));
-		}
-		else
-		{
-			for (int i = 0; i < RedNodeCount; i++)
-				yield return GetArc(GetRedNode(i), u);
-		}
-	}
+    public IEnumerable<Arc> Arcs(Node u, ArcFilter filter = ArcFilter.All)
+    {
+        bool isRed = IsRed(u);
+        if (Directed && (filter == ArcFilter.Edge ||
+            (filter == ArcFilter.Forward && !isRed) ||
+            (filter == ArcFilter.Backward && isRed))) yield break;
 
-	public IEnumerable<Arc> Arcs(Node u, Node v, ArcFilter filter = ArcFilter.All)
-	{
-		Arc arc = GetArc(u, v);
-		if (arc != Arc.Invalid && ArcCount(u, filter) > 0) yield return arc;
-	}
+        if (isRed)
+        {
+            for (int i = 0; i < BlueNodeCount; i++)
+                yield return GetArc(u, GetBlueNode(i));
+        }
+        else
+        {
+            for (int i = 0; i < RedNodeCount; i++)
+                yield return GetArc(GetRedNode(i), u);
+        }
+    }
 
-	public int NodeCount()
-	{
-		return RedNodeCount + BlueNodeCount;
-	}
+    public IEnumerable<Arc> Arcs(Node u, Node v, ArcFilter filter = ArcFilter.All)
+    {
+        Arc arc = GetArc(u, v);
+        if (arc != Arc.Invalid && ArcCount(u, filter) > 0) yield return arc;
+    }
 
-	public int ArcCount(ArcFilter filter = ArcFilter.All)
-	{
-		if (Directed && filter == ArcFilter.Edge) return 0;
-		return RedNodeCount * BlueNodeCount;
-	}
+    public int NodeCount()
+    {
+        return RedNodeCount + BlueNodeCount;
+    }
 
-	public int ArcCount(Node u, ArcFilter filter = ArcFilter.All)
-	{
-		bool isRed = IsRed(u);
-		if (Directed && (filter == ArcFilter.Edge ||
-			(filter == ArcFilter.Forward && !isRed) ||
-			(filter == ArcFilter.Backward && isRed))) return 0;
+    public int ArcCount(ArcFilter filter = ArcFilter.All)
+    {
+        if (Directed && filter == ArcFilter.Edge) return 0;
+        return RedNodeCount * BlueNodeCount;
+    }
 
-		return isRed ? BlueNodeCount : RedNodeCount;
-	}
+    public int ArcCount(Node u, ArcFilter filter = ArcFilter.All)
+    {
+        bool isRed = IsRed(u);
+        if (Directed && (filter == ArcFilter.Edge ||
+            (filter == ArcFilter.Forward && !isRed) ||
+            (filter == ArcFilter.Backward && isRed))) return 0;
 
-	public int ArcCount(Node u, Node v, ArcFilter filter = ArcFilter.All)
-	{
-		if (IsRed(u) == IsRed(v)) return 0;
-		return ArcCount(u, filter) > 0 ? 1 : 0;
-	}
+        return isRed ? BlueNodeCount : RedNodeCount;
+    }
 
-	public bool HasNode(Node node)
-	{
-		return node.Id >= 1 && node.Id <= RedNodeCount + BlueNodeCount;
-	}
+    public int ArcCount(Node u, Node v, ArcFilter filter = ArcFilter.All)
+    {
+        if (IsRed(u) == IsRed(v)) return 0;
+        return ArcCount(u, filter) > 0 ? 1 : 0;
+    }
 
-	public bool HasArc(Arc arc)
-	{
-		return arc.Id >= 1 && arc.Id <= RedNodeCount * BlueNodeCount;
-	}
+    public bool HasNode(Node node)
+    {
+        return node.Id >= 1 && node.Id <= RedNodeCount + BlueNodeCount;
+    }
+
+    public bool HasArc(Arc arc)
+    {
+        return arc.Id >= 1 && arc.Id <= RedNodeCount * BlueNodeCount;
+    }
 }

@@ -12,120 +12,122 @@ namespace Plate.ModernSatsuma;
 /// For special cases, consider the UndirectedGraph and ReverseGraph classes for performance.
 public sealed class RedirectedGraph : IGraph
 {
-	public enum Direction
-	{
-		/// The arc should be directed from U to V.
-		Forward,
-		/// The arc should be directed from V to U.
-		Backward,
-		/// The arc should be undirected.
-		Edge
-	}
+    public enum Direction
+    {
+        /// The arc should be directed from U to V.
+        Forward,
+        /// The arc should be directed from V to U.
+        Backward,
+        /// The arc should be undirected.
+        Edge
+    }
 
-	private IGraph graph;
-	private Func<Arc, Direction> getDirection;
+    private IGraph graph;
+    private Func<Arc, Direction> getDirection;
 
-	/// Creates an adaptor over the given graph for redirecting its arcs.
-	/// \param graph The graph to redirect.
-	/// \param getDirection The function which modifies the arc directions.
-	public RedirectedGraph(IGraph graph, Func<Arc, Direction> getDirection)
-	{
-		this.graph = graph;
-		this.getDirection = getDirection;
-	}
+    /// Creates an adaptor over the given graph for redirecting its arcs.
+    /// \param graph The graph to redirect.
+    /// \param getDirection The function which modifies the arc directions.
+    public RedirectedGraph(IGraph graph, Func<Arc, Direction> getDirection)
+    {
+        this.graph = graph;
+        this.getDirection = getDirection;
+    }
 
-	public Node U(Arc arc)
-	{
-		return getDirection(arc) == Direction.Backward ? graph.V(arc) : graph.U(arc);
-	}
+    public Node U(Arc arc)
+    {
+        return getDirection(arc) == Direction.Backward ? graph.V(arc) : graph.U(arc);
+    }
 
-	public Node V(Arc arc)
-	{
-		return getDirection(arc) == Direction.Backward ? graph.U(arc) : graph.V(arc);
-	}
+    public Node V(Arc arc)
+    {
+        return getDirection(arc) == Direction.Backward ? graph.U(arc) : graph.V(arc);
+    }
 
-	public bool IsEdge(Arc arc)
-	{
-		return getDirection(arc) == Direction.Edge;
-	}
+    public bool IsEdge(Arc arc)
+    {
+        return getDirection(arc) == Direction.Edge;
+    }
 
-	public IEnumerable<Node> Nodes()
-	{
-		return graph.Nodes();
-	}
+    public IEnumerable<Node> Nodes()
+    {
+        return graph.Nodes();
+    }
 
-	public IEnumerable<Arc> Arcs(ArcFilter filter = ArcFilter.All)
-	{
-		return filter == ArcFilter.All ? graph.Arcs() : 
-			graph.Arcs().Where(x => getDirection(x) == Direction.Edge);
-	}
+    public IEnumerable<Arc> Arcs(ArcFilter filter = ArcFilter.All)
+    {
+        return filter == ArcFilter.All ? graph.Arcs() :
+            graph.Arcs().Where(x => getDirection(x) == Direction.Edge);
+    }
 
-	private IEnumerable<Arc> FilterArcs(Node u, IEnumerable<Arc> arcs, ArcFilter filter)
-	{
-		switch (filter)
-		{
-			case ArcFilter.All: return arcs;
-			case ArcFilter.Edge: return arcs.Where(x => getDirection(x) == Direction.Edge);
-			case ArcFilter.Forward: return arcs.Where(x => 
-			{
-				var dir = getDirection(x);
-				switch (dir)
-				{
-					case Direction.Forward: return U(x) == u;
-					case Direction.Backward: return V(x) == u;
-					default: return true;
-				}
-			});
-			default: return arcs.Where(x =>
-			{
-				var dir = getDirection(x);
-				switch (dir)
-				{
-					case Direction.Forward: return V(x) == u;
-					case Direction.Backward: return U(x) == u;
-					default: return true;
-				}
-			});
-		}
-	}
+    private IEnumerable<Arc> FilterArcs(Node u, IEnumerable<Arc> arcs, ArcFilter filter)
+    {
+        switch (filter)
+        {
+            case ArcFilter.All: return arcs;
+            case ArcFilter.Edge: return arcs.Where(x => getDirection(x) == Direction.Edge);
+            case ArcFilter.Forward:
+                return arcs.Where(x =>
+            {
+                var dir = getDirection(x);
+                switch (dir)
+                {
+                    case Direction.Forward: return U(x) == u;
+                    case Direction.Backward: return V(x) == u;
+                    default: return true;
+                }
+            });
+            default:
+                return arcs.Where(x =>
+            {
+                var dir = getDirection(x);
+                switch (dir)
+                {
+                    case Direction.Forward: return V(x) == u;
+                    case Direction.Backward: return U(x) == u;
+                    default: return true;
+                }
+            });
+        }
+    }
 
-	public IEnumerable<Arc> Arcs(Node u, ArcFilter filter = ArcFilter.All)
-	{
-		return FilterArcs(u, graph.Arcs(u), filter);
-	}
+    public IEnumerable<Arc> Arcs(Node u, ArcFilter filter = ArcFilter.All)
+    {
+        return FilterArcs(u, graph.Arcs(u), filter);
+    }
 
-	public IEnumerable<Arc> Arcs(Node u, Node v, ArcFilter filter = ArcFilter.All)
-	{
-		return FilterArcs(u, graph.Arcs(u, v), filter);
-	}
+    public IEnumerable<Arc> Arcs(Node u, Node v, ArcFilter filter = ArcFilter.All)
+    {
+        return FilterArcs(u, graph.Arcs(u, v), filter);
+    }
 
-	public int NodeCount()
-	{
-		return graph.NodeCount();
-	}
+    public int NodeCount()
+    {
+        return graph.NodeCount();
+    }
 
-	public int ArcCount(ArcFilter filter = ArcFilter.All)
-	{
-		return filter == ArcFilter.All ? graph.ArcCount() : Arcs(filter).Count();
-	}
+    public int ArcCount(ArcFilter filter = ArcFilter.All)
+    {
+        return filter == ArcFilter.All ? graph.ArcCount() : Arcs(filter).Count();
+    }
 
-	public int ArcCount(Node u, ArcFilter filter = ArcFilter.All)
-	{
-		return Arcs(u, filter).Count();
-	}
+    public int ArcCount(Node u, ArcFilter filter = ArcFilter.All)
+    {
+        return Arcs(u, filter).Count();
+    }
 
-	public int ArcCount(Node u, Node v, ArcFilter filter = ArcFilter.All)
-	{
-		return Arcs(u, v, filter).Count();
-	}
+    public int ArcCount(Node u, Node v, ArcFilter filter = ArcFilter.All)
+    {
+        return Arcs(u, v, filter).Count();
+    }
 
-	public bool HasNode(Node node)
-	{
-		return graph.HasNode(node);
-	}
+    public bool HasNode(Node node)
+    {
+        return graph.HasNode(node);
+    }
 
-	public bool HasArc(Arc arc)
-	{
-		return graph.HasArc(arc);
-	}
+    public bool HasArc(Arc arc)
+    {
+        return graph.HasArc(arc);
+    }
 }
