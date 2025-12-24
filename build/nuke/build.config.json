@@ -1,7 +1,7 @@
 {
-  "sourceDir": "src",
-  "websiteDir": "../../website",
-  "frameworkDirs": ["src"],
+  "sourceDir": "dotnet/framework",
+  "websiteDir": "website",
+  "frameworkDirs": ["dotnet/framework/src"],
   "syncLocalNugetFeed": false,
   "includePluginNames": [],
   "excludePluginNames": [],

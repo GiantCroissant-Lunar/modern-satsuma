@@ -61,8 +61,7 @@ class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly string Configuration = IsLocalBuild ? "Debug" : "Release";
 
-    [Solution]
-    readonly Solution Solution;
+    Solution Solution => ProjectModelTasks.ParseSolution(RootDirectory / "dotnet" / "framework" / "Plate.ModernSatsuma.sln");
 
     [GitVersion(Framework = "net8.0", NoFetch = true)]
     readonly GitVersion GitVersion;
@@ -343,9 +342,6 @@ class Build : NukeBuild
             NugetDirectory.CreateOrCleanDirectory();
 
             // Load satellite configuration from hub manifest
-            var hubManifestPath = RootDirectory / ".hub-manifest.json";
-            var hubManifest = LoadHubManifest(hubManifestPath);
-            
             var satelliteRoots = (Config?.FrameworkDirs ?? new List<string> { "src" })
                 .Select(d => RootDirectory / d);
 
@@ -355,18 +351,6 @@ class Build : NukeBuild
                 .ToList();
 
             // Apply satellite project filters from hub manifest
-            if (hubManifest?.Satellites?.Build?.IncludeProjects != null && hubManifest.Satellites.Build.IncludeProjects.Count > 0)
-            {
-                satelliteProjects = satelliteProjects
-                    .Where(p => hubManifest.Satellites.Build.IncludeProjects.Contains(System.IO.Path.GetFileNameWithoutExtension(p)))
-                    .ToList();
-            }
-            if (hubManifest?.Satellites?.Build?.ExcludeProjects != null && hubManifest.Satellites.Build.ExcludeProjects.Count > 0)
-            {
-                satelliteProjects = satelliteProjects
-                    .Where(p => !hubManifest.Satellites.Build.ExcludeProjects.Contains(System.IO.Path.GetFileNameWithoutExtension(p)))
-                    .ToList();
-            }
 
             // Also apply any config-based filters (fallback)
             if (Config?.IncludePluginNames != null && Config.IncludePluginNames.Count > 0)
@@ -489,7 +473,8 @@ class Build : NukeBuild
             var webDist = WebsiteDirectory / "dist";
             if (!System.IO.Directory.Exists(webDist))
             {
-                throw new Exception("Website not built. Please run website build process first");
+                Serilog.Log.Warning("Website directory not found at {Path}; skipping website artifact copy", webDist);
+                return;
             }
 
             // Copy built website to artifacts
@@ -505,7 +490,7 @@ class Build : NukeBuild
         });
 
     Target Release => _ => _
-        .DependsOn(Clean, PrintVersion, Publish, Pack, BuildWebsite)
+        .DependsOn(Clean, PrintVersion, Publish, Pack)
         .Executes(() =>
         {
             Serilog.Log.Information("Release artifacts created at: {Path}", VersionedArtifactsDirectory);
