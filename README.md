@@ -1,5 +1,11 @@
 # Plate.ModernSatsuma
 
+![.NET Standard](https://img.shields.io/badge/.NET%20Standard-2.0-blue)
+![C#](https://img.shields.io/badge/C%23-latest-blue)
+![License](https://img.shields.io/badge/license-zlib%2Flibpng-blue)
+![Status](https://img.shields.io/badge/status-development-yellow)
+![NuGet](https://img.shields.io/badge/NuGet-ready-green)
+
 A modernized version of the Satsuma Graph Library for .NET Standard 2.0+.
 
 ## Overview
