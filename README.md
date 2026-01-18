@@ -28,17 +28,37 @@ Plate.ModernSatsuma is a comprehensive graph library providing efficient impleme
 
 ```
 modern-satsuma/
-├── dotnet/
-│   └── framework/
-│       ├── src/
-│       │   └── Plate.ModernSatsuma/     # Main library
-│       ├── tests/
-│       │   └── Plate.ModernSatsuma.Tests/  # Unit tests
-│       └── Plate.ModernSatsuma.sln
-├── build/                                # Build artifacts
-├── docs/                                 # Documentation
-└── scripts/                              # Build/utility scripts
+├── dotnet/framework/
+│   ├── src/Plate.ModernSatsuma/    # Main library
+│   ├── tests/                      # Unit tests
+│   └── Plate.ModernSatsuma.sln
+├── build/                          # Build artifacts
+├── docs/                           # Documentation
+└── scripts/                        # Build/utility scripts
 ```
+
+### Source Code Organization
+
+The library source code is organized into logical folders while keeping all types in the flat `Plate.ModernSatsuma` namespace:
+
+```
+src/Plate.ModernSatsuma/
+├── Core/           # Graph, Path, Node, Arc, PriorityQueue, DisjointSet
+├── Adaptors/       # Subgraph, Supergraph, ReverseGraph, UndirectedGraph, etc.
+├── Generators/     # CompleteGraph, CompleteBipartiteGraph
+├── Traversal/      # Bfs, Dfs, Connectivity, SpanningForest
+├── Algorithms/
+│   ├── ShortestPaths/  # Dijkstra, A*, BellmanFord, BidirectionalDijkstra
+│   ├── Flows/          # Preflow, NetworkSimplex
+│   ├── Matching/       # Matching, BipartiteMaximumMatching
+│   ├── LinearProgramming/  # LP, OptimalSubgraph, OptimalVertexSet
+│   └── Tsp/            # Traveling salesman algorithms
+├── IO/             # GraphML, Lemon format support
+├── Layout/         # Graph layout algorithms
+└── Extensions/     # Modern C# extensions (async, Span<T>, builders)
+```
+
+See [docs/STRUCTURE.md](./docs/STRUCTURE.md) for detailed documentation.
 
 ## Getting Started
 
