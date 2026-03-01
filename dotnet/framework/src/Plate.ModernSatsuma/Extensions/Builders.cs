@@ -401,3 +401,62 @@ public sealed class BidirectionalDijkstraBuilder
         return BidirectionalDijkstra.FindShortestPath(graph, source, target, cost, mode);
     }
 }
+
+/// <summary>
+/// Fluent builder for configuring and executing topological sort.
+/// </summary>
+public sealed class TopologicalSortBuilder
+{
+    private readonly IGraph graph;
+    private ArcFilter arcFilter = ArcFilter.Forward;
+
+    private TopologicalSortBuilder(IGraph graph)
+    {
+        if (graph == null) throw new ArgumentNullException(nameof(graph));
+        this.graph = graph;
+    }
+
+    /// <summary>
+    /// Creates a new topological sort builder for the specified graph.
+    /// </summary>
+    /// <param name="graph">The graph to sort.</param>
+    /// <returns>A new TopologicalSortBuilder instance.</returns>
+    public static TopologicalSortBuilder Create(IGraph graph)
+    {
+        return new TopologicalSortBuilder(graph);
+    }
+
+    /// <summary>
+    /// Specifies the arc filter to use when determining successors.
+    /// </summary>
+    /// <param name="filter">The arc filter.</param>
+    /// <returns>This builder for method chaining.</returns>
+    public TopologicalSortBuilder WithArcFilter(ArcFilter filter)
+    {
+        arcFilter = filter;
+        return this;
+    }
+
+    /// <summary>
+    /// Builds and returns the computed topological sort result.
+    /// </summary>
+    /// <returns>A TopologicalSort instance with the computed ordering.</returns>
+    public TopologicalSort Build()
+    {
+        return new TopologicalSort(graph, arcFilter);
+    }
+}
+
+/// <summary>
+/// Extension methods for creating algorithm builders from <see cref="IGraph"/>.
+/// </summary>
+public static class GraphBuilderExtensions
+{
+    /// <summary>
+    /// Creates a topological sort builder for this graph.
+    /// </summary>
+    /// <param name="graph">The graph to sort.</param>
+    /// <returns>A new <see cref="TopologicalSortBuilder"/>.</returns>
+    public static TopologicalSortBuilder TopologicalSort(this IGraph graph)
+        => TopologicalSortBuilder.Create(graph);
+}
