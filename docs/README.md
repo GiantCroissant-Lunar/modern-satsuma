@@ -24,7 +24,8 @@ This directory contains comprehensive documentation for the Modern Satsuma graph
 - **[Technical Analysis](analysis/)** - Performance analysis, modernization reports
 - **[Testing](testing/)** - Test enhancement plans and results
 - **[Architecture](architecture/)** - Design decisions and architectural documentation
-- **[Build System](NUKE_BUILD_SETUP_COMPLETE.md)** - Nuke build system and GitVersion integration
+- **[Implementation](implementation/)** - Detailed implementation documentation and logs
+- **[Build System](architecture/NUKE_BUILD_SETUP_COMPLETE.md)** - Nuke build system and GitVersion integration
 
 ### 📖 User Documentation
 - **[API Reference](api/)** - API documentation and usage examples
@@ -54,7 +55,7 @@ This directory contains comprehensive documentation for the Modern Satsuma graph
 | [Modernization Complete](status/MODERNIZATION_COMPLETE.md) | Overall modernization | ✅ Complete |
 | [Performance Guide](PERFORMANCE_GUIDE.md) | API performance guide | ✅ Complete |
 | [Nuke Build System](NUKE_BUILD_SETUP_COMPLETE.md) | Build system and GitVersion setup | ✅ Complete |
-| [Documentation Organization](DOCUMENTATION_ORGANIZATION_COMPLETE.md) | Documentation restructuring | ✅ Complete |
+| [Documentation Organization](ORGANIZATION_SUMMARY.md) | Documentation restructuring summary | ✅ Complete |
 
 ---
 

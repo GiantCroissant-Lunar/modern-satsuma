@@ -349,9 +349,9 @@ See `Plate.ModernSatsuma.Drawing.SystemDrawing` as a reference implementation.
 ## Questions?
 
 - Check package README files
-- See updated [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)
+- See updated [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md)
 - Open an issue on GitHub
-- Review [CONTRIBUTING.md](../CONTRIBUTING.md)
+- Review [CONTRIBUTING.md](../../CONTRIBUTING.md)
 
 ---
 

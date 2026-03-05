@@ -7,6 +7,7 @@ This directory contains architectural decisions, design documents, and structura
 ### Project Structure
 - **[Structure Alignment](STRUCTURE_ALIGNMENT.md)** - Project structure and organization decisions
 - **[Build Tooling Applied](BUILD_TOOLING_APPLIED.md)** - Build system and tooling architecture
+- **[Nuke Build Setup Complete](NUKE_BUILD_SETUP_COMPLETE.md)** - Nuke build system setup and configuration
 
 ## 📐 Architecture Overview
 

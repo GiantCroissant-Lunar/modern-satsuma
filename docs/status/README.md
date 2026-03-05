@@ -7,6 +7,8 @@ This directory contains all project status reports, completion summaries, and pr
 ### ✅ Completion Reports
 - **[Critical Fixes Complete](CRITICAL_FIXES_COMPLETE.md)** - Build fixes and basic functionality restoration
 - **[Modernization Complete](MODERNIZATION_COMPLETE.md)** - Overall modernization effort summary
+- **[Test Fixes Complete](TEST_FIXES_COMPLETE.md)** - Test suite fixes and improvements
+- **[Documentation Organization Complete](DOCUMENTATION_ORGANIZATION_COMPLETE.md)** - Documentation reorganization completion
 - **[Test Enhancement Complete](../testing/TEST_ENHANCEMENT_COMPLETE.md)** - Test coverage enhancement results
 
 ## 🎯 Current Status Summary
