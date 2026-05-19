@@ -60,3 +60,20 @@ Thumbs.db
 .agent/
 
 ref-projects/
+
+# Generated agent adapter outputs (regenerate via tools/sync-agent-resources.py)
+.agents/
+.claude/
+.cline/
+.clinerules/
+.codex/
+.cursor/
+.gemini/
+.kilo/
+.kilocode/
+.kiro/
+.opencode/
+.qwen/
+.windsurf/
+CLAUDE.md
+GEMINI.md
