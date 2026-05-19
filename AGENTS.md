@@ -104,7 +104,7 @@ dotnet tool restore
 dotnet tool run unify-build -- Compile
 # Set GITVERSION_MAJORMINORPATCH from tools/gitversion.sh
 dotnet tool run unify-build -- PackProjects
-cp build/_artifacts/*/nuget/*.nupkg C:\lunar-horse\packages\nuget\flat/
+cp build/_artifacts/*/nuget/*.nupkg C:\lunar-horse\packages\nuget/
 ```
 
 Or via Taskfile: `task pack` (wraps the above).
@@ -129,8 +129,8 @@ Or via Taskfile: `task pack` (wraps the above).
 
 ### Local NuGet Feed
 
-- Flat feed at: `C:\lunar-horse\packages\nuget\flat\`
-- Configured in: `C:\lunar-horse\nuget.config`
+- Canonical flat feed at: `C:\lunar-horse\packages\nuget\` (top-level). Legacy `flat/` subdir was removed 2026-05-19.
+- Configured in: `C:\lunar-horse\nuget.config` (and per-repo `nuget.config` via relative path `..\..\packages\nuget`).
 - All projects resolve packages from this feed first.
 
 ### Anti-Patterns
@@ -378,7 +378,7 @@ All native (C/C++/CMake) builds that consume vcpkg ports must resolve the toolch
 - **Disk**: a populated vcpkg checkout is multi-GB. One copy per repo wastes 5+ GB each.
 - **Compile time**: `installed/` (the compiled libs — proj, s2geometry, rocksdb, etc.) is the expensive artifact. Sharing it across consumers means a port compiled once for `x64-windows` is reused everywhere.
 - **Version coherence**: one canonical vcpkg checkout means every consumer sees the same ports tree, same triplets, same baselines.
-- **Mirrors the existing pattern**: `C:\lunar-horse\packages\nuget\flat\` already serves as the shared NuGet feed. vcpkg follows the same model — `packages/` = shared package stores.
+- **Mirrors the existing pattern**: `C:\lunar-horse\packages\nuget\` already serves as the shared NuGet feed. vcpkg follows the same model — `packages/` = shared package stores.
 
 ## How to Apply
 
