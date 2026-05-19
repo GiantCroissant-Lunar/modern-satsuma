@@ -1158,6 +1158,13 @@ tasks:
       echo "🚀 Available tasks:"
       task --list
 
+  # === Changelog ===
+
+  changelog:
+    desc: Generate changelog from conventional commits
+    cmds:
+      - git-cliff -o CHANGELOG.md
+
   # === Default Task ===
 
   default:
