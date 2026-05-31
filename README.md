@@ -1,4 +1,4 @@
-# Plate.ModernSatsuma
+# ModernSatsuma
 
 ![.NET Standard](https://img.shields.io/badge/.NET%20Standard-2.0-blue)
 ![C#](https://img.shields.io/badge/C%23-latest-blue)
@@ -10,7 +10,7 @@ A modernized version of the Satsuma Graph Library for .NET Standard 2.0+.
 
 ## Overview
 
-Plate.ModernSatsuma is a comprehensive graph library providing efficient implementations of graph algorithms, data structures, and utilities for .NET applications.
+ModernSatsuma is a comprehensive graph library providing efficient implementations of graph algorithms, data structures, and utilities for .NET applications.
 
 ## Features
 
@@ -29,9 +29,9 @@ Plate.ModernSatsuma is a comprehensive graph library providing efficient impleme
 ```
 modern-satsuma/
 ├── dotnet/framework/
-│   ├── src/Plate.ModernSatsuma/    # Main library
+│   ├── src/ModernSatsuma/    # Main library
 │   ├── tests/                      # Unit tests
-│   └── Plate.ModernSatsuma.sln
+│   └── ModernSatsuma.sln
 ├── build/                          # Build artifacts
 ├── docs/                           # Documentation
 └── scripts/                        # Build/utility scripts
@@ -39,10 +39,10 @@ modern-satsuma/
 
 ### Source Code Organization
 
-The library source code is organized into logical folders while keeping all types in the flat `Plate.ModernSatsuma` namespace:
+The library source code is organized into logical folders while keeping all types in the flat `ModernSatsuma` namespace:
 
 ```
-src/Plate.ModernSatsuma/
+src/ModernSatsuma/
 ├── Core/           # Graph, Path, Node, Arc, PriorityQueue, DisjointSet
 ├── Adaptors/       # Subgraph, Supergraph, ReverseGraph, UndirectedGraph, etc.
 ├── Generators/     # CompleteGraph, CompleteBipartiteGraph
@@ -96,7 +96,7 @@ See [Nuke Build Documentation](./docs/NUKE_BUILD_SETUP_COMPLETE.md) for complete
 ### Using the Library
 
 ```csharp
-using Plate.ModernSatsuma;
+using ModernSatsuma;
 
 // Create a custom graph
 var graph = new CustomGraph();

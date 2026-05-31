@@ -1,6 +1,6 @@
 # Claude Code Instructions - ModernSatsuma
 
-**Project**: Plate.ModernSatsuma  
+**Project**: ModernSatsuma (PackageId family: `GiantCroissant.ModernSatsuma.*`)  
 **Location (repo root)**: `<repo-root>`  
 **Workspace**: `<workspace-name>`
 
@@ -12,12 +12,12 @@ Core projects currently build successfully (see `AGENTS.md` and `docs/status/MOD
 The issues below are **historical** build blockers and must remain fixed:
 
 1. **Duplicate IClearable Interface** (CS0101)
-   - File 1: `dotnet/framework/src/Plate.ModernSatsuma/Graph.cs` (lines 138-141)
-   - File 2: `dotnet/framework/src/Plate.ModernSatsuma/Utils.cs` (lines 12-17)
+   - File 1: `dotnet/framework/src/ModernSatsuma/Graph.cs` (lines 138-141)
+   - File 2: `dotnet/framework/src/ModernSatsuma/Utils.cs` (lines 12-17)
    - **Fix (already applied)**: Delete from Utils.cs, keep in Graph.cs
 
 2. **Drawing.cs Dependencies** (CS0234/CS0246)
-   - File: `dotnet/framework/src/Plate.ModernSatsuma/Drawing.cs`
+   - File: `dotnet/framework/src/ModernSatsuma/Drawing.cs`
    - Problem: System.Drawing not available in .NET Standard 2.0
    - **Current state**: `Drawing.cs` is excluded from the core build; drawing is provided by dedicated renderer packages.
 
@@ -36,9 +36,9 @@ See `docs/FIX_ACTION_PLAN.md` for the historical step-by-step resolution.
 ```
 modern-satsuma/
 ├── dotnet/framework/                    # .NET solution (NOT in root)
-│   ├── Plate.ModernSatsuma.sln
-│   ├── src/Plate.ModernSatsuma/        # Main library
-│   └── tests/Plate.ModernSatsuma.Tests/
+│   ├── ModernSatsuma.sln
+│   ├── src/ModernSatsuma/        # Main library
+│   └── tests/ModernSatsuma.Tests/
 ├── build/                              # Build artifacts
 ├── docs/                               # Documentation
 └── scripts/                            # Build scripts (future)
@@ -60,13 +60,14 @@ dotnet test
 ## Key Principles
 
 ### R-MODERNSATSUMA-010: Solution Location ⭐ CRITICAL
-Solution is at `dotnet/framework/Plate.ModernSatsuma.sln`, NOT in root.  
+Solution is at `dotnet/framework/ModernSatsuma.sln`, NOT in root.  
 Always `cd dotnet/framework` before running dotnet commands.
 
-### R-MODERNSATSUMA-020: Namespace Convention
-- **Current**: `Plate.ModernSatsuma`
-- **Old**: `Satsuma` (original library)
-- **Never** use the old `Satsuma` namespace
+### R-MODERNSATSUMA-020: Namespace & Package Naming
+- **Namespace (code)**: `ModernSatsuma` — bare, no `Plate.` prefix.
+- **AssemblyName / DLL**: `ModernSatsuma.*` (matches the namespace).
+- **PackageId (NuGet)**: `GiantCroissant.ModernSatsuma.*` (e.g. `GiantCroissant.ModernSatsuma`, `.Abstractions`, `.Drawing.SkiaSharp`, `.Drawing.SystemDrawing`, `.SourceGenerators`).
+- **Old (do NOT use)**: `Plate.ModernSatsuma` (dropped 2026-05-31) and `Satsuma` (original library).
 
 ### R-MODERNSATSUMA-030: Target Framework
 - **Library**: .NET Standard 2.0 (broad compatibility)
@@ -172,12 +173,12 @@ See `docs/FIX_ACTION_PLAN.md` for detailed steps.
 cd <repo-root>
 
 # Historical Fix 1: Remove duplicate IClearable from Utils.cs
-# Edit dotnet/framework/src/Plate.ModernSatsuma/Utils.cs
+# Edit dotnet/framework/src/ModernSatsuma/Utils.cs
 # Delete lines 12-17
 
 # Historical Fix 2: Disable Drawing.cs
-# mv dotnet/framework/src/Plate.ModernSatsuma/Drawing.cs \
-#    dotnet/framework/src/Plate.ModernSatsuma/Drawing.cs.DISABLED
+# mv dotnet/framework/src/ModernSatsuma/Drawing.cs \
+#    dotnet/framework/src/ModernSatsuma/Drawing.cs.DISABLED
 
 # Test build
 cd dotnet/framework
@@ -187,10 +188,10 @@ dotnet build
 
 ### Task: Add New Algorithm
 
-1. Create `dotnet/framework/src/Plate.ModernSatsuma/YourAlgorithm.cs`
-2. Namespace: `Plate.ModernSatsuma`
+1. Create `dotnet/framework/src/ModernSatsuma/YourAlgorithm.cs`
+2. Namespace: `ModernSatsuma`
 3. Follow patterns in existing files (e.g., `Dijsktra.cs`)
-4. Add tests: `dotnet/framework/tests/Plate.ModernSatsuma.Tests/YourAlgorithmTests.cs`
+4. Add tests: `dotnet/framework/tests/ModernSatsuma.Tests/YourAlgorithmTests.cs`
 5. Build and test
 
 ### Task: Update Documentation
@@ -214,21 +215,21 @@ Or let pre-commit hooks handle it automatically.
 ## File Locations
 
 ### Source Code
-- **Main library**: `dotnet/framework/src/Plate.ModernSatsuma/*.cs`
+- **Main library**: `dotnet/framework/src/ModernSatsuma/*.cs`
 - **Core types**: `Graph.cs` (Node, Arc, interfaces)
 - **Algorithms**: `Dijsktra.cs`, `BellmanFord.cs`, `Preflow.cs`, etc.
 - **I/O**: `IO.cs`, `IO.GraphML.cs`
 - **Broken**: `Drawing.cs` (System.Drawing dependency)
 
 ### Tests
-- **Location**: `dotnet/framework/tests/Plate.ModernSatsuma.Tests/*.cs`
+- **Location**: `dotnet/framework/tests/ModernSatsuma.Tests/*.cs`
 - **Framework**: xUnit
 - **Target**: .NET 8.0
 
 ### Configuration
-- **Solution**: `dotnet/framework/Plate.ModernSatsuma.sln`
+- **Solution**: `dotnet/framework/ModernSatsuma.sln`
 - **Packages**: `dotnet/framework/Directory.Packages.props`
-- **Project**: `dotnet/framework/src/Plate.ModernSatsuma/Plate.ModernSatsuma.csproj`
+- **Project**: `dotnet/framework/src/ModernSatsuma/ModernSatsuma.csproj`
 
 ---
 
@@ -237,7 +238,7 @@ Or let pre-commit hooks handle it automatically.
 ### DO ✅
 
 - Read workspace rules first (if available): `<workspace-root>/.agent/local/overrides.md`
-- Use `Plate.ModernSatsuma` namespace
+- Use `ModernSatsuma` namespace
 - Target .NET Standard 2.0 for library code
 - Add XML documentation to public APIs
 - Add unit tests for new features
@@ -280,8 +281,8 @@ When working in this project:
 
 ## Version Information
 
-**Current Status**: v0.1.0-alpha (pre-release, core projects build)  
-**Last Updated**: 2025-11-17  
+**Current Status**: v0.0.1 (core + Abstractions + Drawing renderers + SourceGenerators build; 415 tests pass, 7 pre-existing System.Drawing GDI+ failures in SystemDrawing.Tests)  
+**Last Updated**: 2026-05-31 (dropped the `Plate.` prefix: namespace → `ModernSatsuma`, PackageIds → `GiantCroissant.ModernSatsuma.*`)  
 **Next Milestone**: Expand tests/benchmarks and complete remaining quality improvements
 
 ---

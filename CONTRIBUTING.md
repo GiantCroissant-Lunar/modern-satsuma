@@ -1,6 +1,6 @@
-# Contributing to Plate.ModernSatsuma
+# Contributing to ModernSatsuma
 
-Thank you for your interest in contributing to Plate.ModernSatsuma!
+Thank you for your interest in contributing to ModernSatsuma!
 
 ## Getting Started
 
@@ -28,8 +28,8 @@ dotnet test
 ```
 modern-satsuma/
 ├── dotnet/framework/
-│   ├── src/Plate.ModernSatsuma/       # Main library source
-│   └── tests/Plate.ModernSatsuma.Tests/ # Unit tests
+│   ├── src/ModernSatsuma/       # Main library source
+│   └── tests/ModernSatsuma.Tests/ # Unit tests
 ├── docs/                              # Documentation
 └── build/                             # Build artifacts
 ```
@@ -42,8 +42,8 @@ modern-satsuma/
    ```
 
 2. **Make your changes**
-   - Edit files in `dotnet/framework/src/Plate.ModernSatsuma/`
-   - Add tests in `dotnet/framework/tests/Plate.ModernSatsuma.Tests/`
+   - Edit files in `dotnet/framework/src/ModernSatsuma/`
+   - Add tests in `dotnet/framework/tests/ModernSatsuma.Tests/`
 
 3. **Build and test**
    ```bash

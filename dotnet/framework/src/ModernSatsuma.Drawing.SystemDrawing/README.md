@@ -1,10 +1,10 @@
-# Plate.ModernSatsuma.Drawing.SystemDrawing
+# ModernSatsuma.Drawing.SystemDrawing
 
 System.Drawing-based implementation of Modern Satsuma graph visualization.
 
 ## Overview
 
-This package provides a concrete implementation of the `Plate.ModernSatsuma.Abstractions` drawing interfaces using `System.Drawing.Common`. It enables graph visualization using the GDI+ graphics API.
+This package provides a concrete implementation of the `ModernSatsuma.Abstractions` drawing interfaces using `System.Drawing.Common`. It enables graph visualization using the GDI+ graphics API.
 
 ## Platform Support
 
@@ -16,13 +16,13 @@ This package provides a concrete implementation of the `Plate.ModernSatsuma.Abst
 - Legacy system compatibility
 
 **For cross-platform applications**, consider using:
-- `Plate.ModernSatsuma.Drawing.SkiaSharp` (when available) - hardware-accelerated, truly cross-platform
-- `Plate.ModernSatsuma.Drawing.ImageSharp` (when available) - pure C#, cross-platform
+- `ModernSatsuma.Drawing.SkiaSharp` (when available) - hardware-accelerated, truly cross-platform
+- `ModernSatsuma.Drawing.ImageSharp` (when available) - pure C#, cross-platform
 
 ## Installation
 
 ```bash
-dotnet add package Plate.ModernSatsuma.Drawing.SystemDrawing
+dotnet add package GiantCroissant.ModernSatsuma.Drawing.SystemDrawing
 ```
 
 ## Usage
@@ -30,9 +30,9 @@ dotnet add package Plate.ModernSatsuma.Drawing.SystemDrawing
 ### Basic Example
 
 ```csharp
-using Plate.ModernSatsuma;
-using Plate.ModernSatsuma.Drawing.SystemDrawing;
-using Plate.ModernSatsuma.Abstractions;
+using ModernSatsuma;
+using ModernSatsuma.Drawing.SystemDrawing;
+using ModernSatsuma.Abstractions;
 
 // Create a graph
 var graph = new CompleteGraph(7);
@@ -145,9 +145,9 @@ bitmap.Save("graph.png");
 
 **After:**
 ```csharp
-using Plate.ModernSatsuma;
-using Plate.ModernSatsuma.Drawing.SystemDrawing;
-using Plate.ModernSatsuma.Abstractions;
+using ModernSatsuma;
+using ModernSatsuma.Drawing.SystemDrawing;
+using ModernSatsuma.Abstractions;
 
 var factory = new SystemDrawingRenderSurfaceFactory();
 var drawer = new GraphDrawer(graph, factory.GraphicsFactory)
@@ -187,5 +187,5 @@ Zlib License - See LICENSE file in repository root.
 
 ## See Also
 
-- [Plate.ModernSatsuma](../Plate.ModernSatsuma/) - Core graph library
-- [Plate.ModernSatsuma.Abstractions](../Plate.ModernSatsuma.Abstractions/) - Drawing abstractions
+- [ModernSatsuma](../ModernSatsuma/) - Core graph library
+- [ModernSatsuma.Abstractions](../ModernSatsuma.Abstractions/) - Drawing abstractions

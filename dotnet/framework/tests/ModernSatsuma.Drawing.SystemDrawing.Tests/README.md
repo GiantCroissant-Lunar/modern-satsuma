@@ -1,6 +1,6 @@
-# Plate.ModernSatsuma.Drawing.SystemDrawing.Tests
+# ModernSatsuma.Drawing.SystemDrawing.Tests
 
-This test project provides comprehensive test coverage for the `Plate.ModernSatsuma.Drawing.SystemDrawing` library, which implements the drawing abstractions using System.Drawing.Common.
+This test project provides comprehensive test coverage for the `ModernSatsuma.Drawing.SystemDrawing` library, which implements the drawing abstractions using System.Drawing.Common.
 
 ## Test Coverage (128 tests)
 
@@ -21,7 +21,7 @@ This test project provides comprehensive test coverage for the `Plate.ModernSats
 ## Running Tests
 
 ```bash
-dotnet test Plate.ModernSatsuma.Drawing.SystemDrawing.Tests
+dotnet test ModernSatsuma.Drawing.SystemDrawing.Tests
 ```
 
 **Note**: System.Drawing.Common is only fully supported on Windows. On macOS/Linux, most tests will fail with `PlatformNotSupportedException`. This is expected behavior. The tests are designed to validate functionality on Windows platforms.

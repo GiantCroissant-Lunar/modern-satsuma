@@ -1,4 +1,4 @@
-# Plate.ModernSatsuma.Abstractions
+# ModernSatsuma.Abstractions
 
 Platform-agnostic drawing abstractions for Modern Satsuma graph visualization.
 
@@ -12,13 +12,13 @@ The abstraction layer separates the graph drawing logic from the actual renderin
 
 ```
 ┌─────────────────────────────────────┐
-│  Plate.ModernSatsuma               │
+│  ModernSatsuma               │
 │  (Core graph algorithms & data)    │
 └──────────────┬──────────────────────┘
                │
                ▼
 ┌─────────────────────────────────────┐
-│  Plate.ModernSatsuma.Abstractions  │
+│  ModernSatsuma.Abstractions  │
 │  (Drawing interfaces)              │
 └──────────────┬──────────────────────┘
                │
@@ -61,10 +61,10 @@ This package is typically not used directly. Instead, install a rendering implem
 
 ```bash
 # For Windows-focused applications
-dotnet add package Plate.ModernSatsuma.Drawing.SystemDrawing
+dotnet add package GiantCroissant.ModernSatsuma.Drawing.SystemDrawing
 
 # For cross-platform applications (coming soon)
-dotnet add package Plate.ModernSatsuma.Drawing.SkiaSharp
+dotnet add package GiantCroissant.ModernSatsuma.Drawing.SkiaSharp
 ```
 
 ## Creating Custom Implementations
@@ -76,7 +76,7 @@ To create your own rendering backend:
 3. Implement `IGraphicsFactory` for creating pens, brushes, and fonts
 4. Optionally implement `INodeShape` and `INodeStyle` for custom node rendering
 
-See `Plate.ModernSatsuma.Drawing.SystemDrawing` for a complete reference implementation.
+See `ModernSatsuma.Drawing.SystemDrawing` for a complete reference implementation.
 
 ## Benefits
 

@@ -1,10 +1,10 @@
-# Plate.ModernSatsuma.Drawing.SkiaSharp
+# ModernSatsuma.Drawing.SkiaSharp
 
 SkiaSharp-based implementation of Modern Satsuma graph visualization - truly cross-platform and hardware-accelerated.
 
 ## Overview
 
-This package provides a concrete implementation of the `Plate.ModernSatsuma.Abstractions` drawing interfaces using SkiaSharp, Google's 2D graphics library. It enables high-quality, hardware-accelerated graph visualization across all platforms.
+This package provides a concrete implementation of the `ModernSatsuma.Abstractions` drawing interfaces using SkiaSharp, Google's 2D graphics library. It enables high-quality, hardware-accelerated graph visualization across all platforms.
 
 ## Platform Support
 
@@ -28,7 +28,7 @@ This package provides a concrete implementation of the `Plate.ModernSatsuma.Abst
 ## Installation
 
 ```bash
-dotnet add package Plate.ModernSatsuma.Drawing.SkiaSharp
+dotnet add package GiantCroissant.ModernSatsuma.Drawing.SkiaSharp
 ```
 
 ## Usage
@@ -36,9 +36,9 @@ dotnet add package Plate.ModernSatsuma.Drawing.SkiaSharp
 ### Basic Example
 
 ```csharp
-using Plate.ModernSatsuma;
-using Plate.ModernSatsuma.Drawing.SkiaSharp;
-using Plate.ModernSatsuma.Abstractions;
+using ModernSatsuma;
+using ModernSatsuma.Drawing.SkiaSharp;
+using ModernSatsuma.Abstractions;
 
 // Create a graph
 var graph = new CompleteGraph(7);
@@ -267,13 +267,13 @@ The API is identical! Just change the factory:
 
 **Before:**
 ```csharp
-using Plate.ModernSatsuma.Drawing.SystemDrawing;
+using ModernSatsuma.Drawing.SystemDrawing;
 var factory = new SystemDrawingRenderSurfaceFactory();
 ```
 
 **After:**
 ```csharp
-using Plate.ModernSatsuma.Drawing.SkiaSharp;
+using ModernSatsuma.Drawing.SkiaSharp;
 var factory = new SkiaSharpRenderSurfaceFactory();
 ```
 
@@ -326,7 +326,7 @@ Zlib License - See LICENSE file in repository root.
 
 ## See Also
 
-- [Plate.ModernSatsuma](../Plate.ModernSatsuma/) - Core graph library
-- [Plate.ModernSatsuma.Abstractions](../Plate.ModernSatsuma.Abstractions/) - Drawing abstractions
+- [ModernSatsuma](../ModernSatsuma/) - Core graph library
+- [ModernSatsuma.Abstractions](../ModernSatsuma.Abstractions/) - Drawing abstractions
 - [SkiaSharp Documentation](https://docs.microsoft.com/en-us/xamarin/xamarin-forms/user-interface/graphics/skiasharp/)
 - [SkiaSharp GitHub](https://github.com/mono/SkiaSharp)

@@ -1,6 +1,6 @@
-# Plate.ModernSatsuma.Drawing.SkiaSharp.Tests
+# ModernSatsuma.Drawing.SkiaSharp.Tests
 
-This test project provides comprehensive test coverage for the `Plate.ModernSatsuma.Drawing.SkiaSharp` library, which implements the drawing abstractions using SkiaSharp.
+This test project provides comprehensive test coverage for the `ModernSatsuma.Drawing.SkiaSharp` library, which implements the drawing abstractions using SkiaSharp.
 
 ## Test Coverage (128 tests)
 
@@ -21,7 +21,7 @@ This test project provides comprehensive test coverage for the `Plate.ModernSats
 ## Running Tests
 
 ```bash
-dotnet test Plate.ModernSatsuma.Drawing.SkiaSharp.Tests
+dotnet test ModernSatsuma.Drawing.SkiaSharp.Tests
 ```
 
 **Note**: SkiaSharp is cross-platform and should work on Windows, macOS, and Linux. These tests mirror the SystemDrawing tests but use the SkiaSharp backend.

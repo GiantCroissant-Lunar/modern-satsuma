@@ -1,6 +1,6 @@
-# Plate.ModernSatsuma.Abstractions.Tests
+# ModernSatsuma.Abstractions.Tests
 
-This test project provides comprehensive test coverage for the `Plate.ModernSatsuma.Abstractions` library, which defines platform-agnostic drawing interfaces and types.
+This test project provides comprehensive test coverage for the `ModernSatsuma.Abstractions` library, which defines platform-agnostic drawing interfaces and types.
 
 ## Test Coverage
 
@@ -13,7 +13,7 @@ This test project provides comprehensive test coverage for the `Plate.ModernSats
 ## Running Tests
 
 ```bash
-dotnet test Plate.ModernSatsuma.Abstractions.Tests
+dotnet test ModernSatsuma.Abstractions.Tests
 ```
 
 ## Test Framework
