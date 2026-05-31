@@ -61,7 +61,7 @@ class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly string Configuration = IsLocalBuild ? "Debug" : "Release";
 
-    Solution Solution => ProjectModelTasks.ParseSolution(RootDirectory / "dotnet" / "framework" / "Plate.ModernSatsuma.sln");
+    Solution Solution => ProjectModelTasks.ParseSolution(RootDirectory / "dotnet" / "framework" / "ModernSatsuma.sln");
 
     [GitVersion(Framework = "net8.0", NoFetch = true)]
     readonly GitVersion GitVersion;
