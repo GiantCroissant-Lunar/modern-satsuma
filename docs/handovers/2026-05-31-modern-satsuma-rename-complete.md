@@ -73,11 +73,13 @@ correctly left alone (reference-only / build-harness, not shipped, not `Plate.`-
 Authority: memory **`project-drop-plate-prefix-timedete`** (STILL TODO section) + the recipe handover §4.
 
 1. ~~Consumer migration to the new `GiantCroissant.{ServiceArchi,PluginArchi}.*` PackageIds~~ **DONE 2026-05-31**
-   (full cascade, per user). crosscut-foundation `e7b8b68` (+tag `v0.2.1`, re-packed 0.2.1), fantasim-world `4251c45`
-   (re-packed 0.2.94), fantasim-app-godot `c2d24a0` (32 csproj; crosscut floats →0.2.1, FantaSim 0.2.93→0.2.94),
-   orc-bot `080de17`. Zero in-scope old-ID refs remain; muni-dungeon stays old via dual-publish. Full detail in the
-   memory. Carry-forward gotchas: new plugin-archi has **no `.Contracts`** package; crosscut `task pack:scg` is broken
-   (empty-version subtask env) so the SCG decorator packages stayed at 0.2.0 (harmless).
+   (crosscut → fantasim-world → app-godot). crosscut-foundation `e7b8b68` (+tag `v0.2.1`, re-packed 0.2.1),
+   fantasim-world `4251c45` (re-packed 0.2.94), fantasim-app-godot `c2d24a0` (32 csproj; crosscut floats →0.2.1,
+   FantaSim 0.2.93→0.2.94). **orc-bot SKIPPED per user** — its migration `080de17` was reverted (`859fcea`); it stays
+   on old IDs (standalone leaf, dual-published, nothing consumes it). Zero in-scope old-ID refs remain *outside
+   orc-bot*; muni-dungeon stays old via dual-publish. Full detail in the memory. Carry-forward gotchas: new
+   plugin-archi has **no `.Contracts`** package; crosscut `task pack:scg` is broken (empty-version subtask env) so the
+   SCG decorator packages stayed at 0.2.0 (harmless).
 2. **PLUG009 whitelist read bug** (plugin-archi) — `PluginArchiSharedAssemblyPrefixes` reaches the editorconfig but
    not the analyzer's `GlobalOptions` at real build time; needs a `v0.1.6` bump to re-test. See
    `reference-rfc0014-shared-contract-alc`. **← now the top open thread.**
