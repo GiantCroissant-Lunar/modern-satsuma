@@ -37,4 +37,9 @@
        - ModernSatsuma.Drawing.SystemDrawing: System.Drawing implementation
        Layout functionality is in the Layout/ folder -->
 
+  <ItemGroup>
+    <!-- Canonical math types (Vector2D for graph layout). -->
+    <PackageReference Include="UnifyMaths" />
+  </ItemGroup>
+
 </Project>

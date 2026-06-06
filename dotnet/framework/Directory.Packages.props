@@ -5,6 +5,8 @@
 
   <ItemGroup>
     <!-- Non-test Packages -->
+    <!-- Foundation Packages -->
+    <PackageVersion Include="UnifyMaths" Version="0.1.5" />
     <!-- Drawing Packages -->
     <PackageVersion Include="System.Drawing.Common" Version="8.0.0" />
     <PackageVersion Include="SkiaSharp" Version="3.119.1" />

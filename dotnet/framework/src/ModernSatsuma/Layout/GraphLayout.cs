@@ -1,55 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using UnifyMaths;
 
 namespace ModernSatsuma
 {
-    /// <summary>
-    /// An immutable point whose coordinates are double.
-    /// </summary>
-    public struct PointD : IEquatable<PointD>
-    {
-        public double X { get; }
-        public double Y { get; }
-
-        public PointD(double x, double y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public bool Equals(PointD other) => X == other.X && Y == other.Y;
-        public override bool Equals(object? obj) => obj is PointD other && Equals(other);
-        public static bool operator ==(PointD a, PointD b) => a.Equals(b);
-        public static bool operator !=(PointD a, PointD b) => !(a == b);
-        public override int GetHashCode() => HashCode.Combine(X, Y);
-
-        public string ToString(IFormatProvider provider) =>
-            string.Format(provider, "({0} {1})", X, Y);
-
-        public override string ToString() => ToString(CultureInfo.CurrentCulture);
-
-        /// <summary>
-        /// Returns the vector sum of two points.
-        /// </summary>
-        public static PointD operator +(PointD a, PointD b) => new(a.X + b.X, a.Y + b.Y);
-
-        /// <summary>
-        /// Added for CLS compliancy.
-        /// </summary>
-        public static PointD Add(PointD a, PointD b) => a + b;
-
-        /// <summary>
-        /// Returns the Euclidean distance from another point.
-        /// </summary>
-        public double Distance(PointD other)
-        {
-            double dx = X - other.X;
-            double dy = Y - other.Y;
-            return Math.Sqrt(dx * dx + dy * dy);
-        }
-    }
-
     /// <summary>
     /// Attempts to draw a graph to the plane such that a certain equilibrium is attained.
     /// Models the graph as electrically charged nodes connected with springs.
@@ -62,10 +16,10 @@ namespace ModernSatsuma
     /// The algorithm starts from a given configuration (e.g. a random placement)
     /// and lets the forces move the graph to an equilibrium.
     /// Simulated annealing is used to ensure good convergence.
-    /// Each convergence step requires O(n²) time, where n is the number of the nodes.
+    /// Each convergence step requires O(n^2) time, where n is the number of the nodes.
     ///
     /// Force-directed layout algorithms work best for graphs with a few nodes (under about 100).
-    /// Not only because of the running time, but also the probability of running into a poor local minimum 
+    /// Not only because of the running time, but also the probability of running into a poor local minimum
     /// is quite high for a large graph. This decreases the chance that a nice arrangement is attained.
     ///
     /// Example:
@@ -102,14 +56,14 @@ namespace ModernSatsuma
         /// <summary>
         /// The current layout, which assigns positions to the nodes.
         /// </summary>
-        public Dictionary<Node, PointD> NodePositions { get; }
+        public Dictionary<Node, Vector2D> NodePositions { get; }
 
         /// <summary>
         /// The function defining the attraction force between two connected nodes.
         /// Arcs are viewed as springs that want to bring the two connected nodes together.
         /// The function takes a single parameter, which is the distance of the two nodes.
         ///
-        /// The default force function is 2·ln(d).
+        /// The default force function is 2*ln(d).
         /// </summary>
         public Func<double, double> SpringForce { get; set; }
 
@@ -118,7 +72,7 @@ namespace ModernSatsuma
         /// Nodes are viewed as electrically charged particles which repel each other.
         /// The function takes a single parameter, which is the distance of the two nodes.
         ///
-        /// The default force function is 1/d².
+        /// The default force function is 1/d^2.
         /// </summary>
         public Func<double, double> ElectricForce { get; set; }
 
@@ -132,10 +86,10 @@ namespace ModernSatsuma
         /// </summary>
         public double TemperatureAttenuation { get; set; }
 
-        public ForceDirectedLayout(IGraph graph, Func<Node, PointD>? initialPositions = null)
+        public ForceDirectedLayout(IGraph graph, Func<Node, Vector2D>? initialPositions = null)
         {
             Graph = graph;
-            NodePositions = new Dictionary<Node, PointD>();
+            NodePositions = new Dictionary<Node, Vector2D>();
             SpringForce = d => 2 * Math.Log(d);
             ElectricForce = d => 1 / (d * d);
             TemperatureAttenuation = DefaultTemperatureAttenuation;
@@ -147,13 +101,13 @@ namespace ModernSatsuma
         /// Initializes the layout with the given one and resets the temperature.
         /// </summary>
         /// <param name="initialPositions">If null, a random layout is used.</param>
-        public void Initialize(Func<Node, PointD>? initialPositions = null)
+        public void Initialize(Func<Node, Vector2D>? initialPositions = null)
         {
             if (initialPositions == null)
             {
                 // Make a random layout
                 var r = new Random();
-                initialPositions = _ => new PointD(r.NextDouble(), r.NextDouble());
+                initialPositions = _ => new Vector2D(r.NextDouble(), r.NextDouble());
             }
 
             foreach (var node in Graph.Nodes())
@@ -168,18 +122,18 @@ namespace ModernSatsuma
         /// </summary>
         public void Step()
         {
-            var forces = new Dictionary<Node, PointD>();
+            var forces = new Dictionary<Node, Vector2D>();
 
             foreach (var u in Graph.Nodes())
             {
-                PointD uPos = NodePositions[u];
+                Vector2D uPos = NodePositions[u];
                 double xForce = 0, yForce = 0;
 
                 // Attraction forces
                 foreach (var arc in Graph.Arcs(u))
                 {
-                    PointD vPos = NodePositions[Graph.Other(arc, u)];
-                    double d = uPos.Distance(vPos);
+                    Vector2D vPos = NodePositions[Graph.Other(arc, u)];
+                    double d = (uPos - vPos).Length();
                     double force = Temperature * SpringForce(d);
                     xForce += (vPos.X - uPos.X) / d * force;
                     yForce += (vPos.Y - uPos.Y) / d * force;
@@ -189,14 +143,14 @@ namespace ModernSatsuma
                 foreach (var v in Graph.Nodes())
                 {
                     if (v == u) continue;
-                    PointD vPos = NodePositions[v];
-                    double d = uPos.Distance(vPos);
+                    Vector2D vPos = NodePositions[v];
+                    double d = (uPos - vPos).Length();
                     double force = Temperature * ElectricForce(d);
                     xForce += (uPos.X - vPos.X) / d * force;
                     yForce += (uPos.Y - vPos.Y) / d * force;
                 }
 
-                forces[u] = new PointD(xForce, yForce);
+                forces[u] = new Vector2D(xForce, yForce);
             }
 
             foreach (var node in Graph.Nodes())
