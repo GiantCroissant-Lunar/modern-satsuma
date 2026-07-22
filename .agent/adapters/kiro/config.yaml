@@ -1,0 +1,54 @@
+# Kiro IDE deployment.
+#
+# Populates .kiro/skills/ (symlinks per skill) and .kiro/steering/<rule>.md
+# (one file per rule -- Kiro's native steering format, NOT a single AGENTS.md).
+# Kiro does not natively read .agents/skills/ or AGENTS.md, so it needs its
+# own deployment.
+
+tool: kiro
+display_name: Kiro IDE
+
+skills:
+  target: .kiro/skills
+  strategy: symlink
+  local: []
+  workspace:
+    - 00-meta/autoloop
+    - 00-meta/check-before-claim
+    - 00-meta/context-discovery
+    - 00-meta/implementation-review
+    - 00-meta/rfc-orchestrator
+    - 00-meta/rfc-review
+    - 00-meta/skill-creator
+    - 00-meta/validation-guard
+    - 04-tooling/build
+    - 04-tooling/commit
+    - 04-tooling/external-agent-delegation
+    - 04-tooling/mcp-troubleshooter
+    - 04-tooling/nuget-restore
+    - 04-tooling/repomix
+    - 04-tooling/unify-build
+    - 04-tooling/vendor-patches
+    - 04-tooling/vendor-restore
+
+rules:
+  target: .kiro/steering
+  strategy: per_file
+  extension: .md
+  local: []
+  workspace:
+    - audit-existing-surfaces
+    - build-conventions
+    - commit-often
+    - consult-skills-before-claiming
+    - never-delete-repos
+    - respect-other-agents-git-index
+    - shared-native-deps
+    - verify-godot-export
+    - write-changes-inside-the-active-project
+
+mcp:
+  enabled: false
+
+hooks:
+  enabled: false

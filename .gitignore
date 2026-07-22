@@ -56,8 +56,13 @@ Thumbs.db
 
 # Hub sync (added by task hub:sync)
 .hub-cache/
-.agent
-.agent/
+.agent/*
+!.agent/adapters/
+!.agent/adapters/**
+!.agent/rules/
+!.agent/rules/**
+!.agent/skills/
+!.agent/skills/**
 
 ref-projects/
 

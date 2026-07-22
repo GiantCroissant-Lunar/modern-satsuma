@@ -1,0 +1,35 @@
+# Kilo Code CLI deployment.
+#
+# Kilo Code is installed as both `kilo` and `kilocode`. CLI runs headless with
+# `kilo run`. Kilo natively reads .agents/skills/ and AGENTS.md, so it does not
+# need a separate sync target -- this file only documents the CLI invocation.
+
+tool: kilo
+display_name: Kilo Code CLI
+status: active
+
+cli:
+  executable: kilo
+  aliases:
+    - kilocode
+  non_interactive:
+    - kilo
+    - run
+    - --dir
+    - .
+    - --auto
+    - "<task>"
+  model_override:
+    flag: --model
+    format: provider/model
+
+context:
+  primary_rules: AGENTS.md
+  skill_mirrors:
+    - .agents/skills
+
+mcp:
+  enabled: false
+
+hooks:
+  enabled: false

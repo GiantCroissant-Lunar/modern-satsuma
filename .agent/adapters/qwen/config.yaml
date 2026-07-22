@@ -1,0 +1,54 @@
+# Qwen Code CLI deployment.
+#
+# Qwen Code auto-discovers root AGENTS.md as project memory and auto-scans
+# .qwen/skills/<name>/SKILL.md plus .agents/skills/<name>/SKILL.md. We provide
+# .qwen/skills/ as a copy (not symlink) because Qwen has had inconsistent
+# support for following NTFS junctions on Windows.
+
+tool: qwen
+display_name: Qwen Code CLI
+status: active
+
+cli:
+  executable: qwen
+  non_interactive:
+    - qwen
+    - --approval-mode
+    - auto-edit
+    - --output-format
+    - text
+    - "<task>"
+  notes:
+    - "Prefer positional prompts (--prompt is deprecated)."
+
+context:
+  memory_file: AGENTS.md
+
+skills:
+  target: .qwen/skills
+  strategy: symlink
+  local: []
+  workspace:
+    - 00-meta/autoloop
+    - 00-meta/check-before-claim
+    - 00-meta/context-discovery
+    - 00-meta/implementation-review
+    - 00-meta/rfc-orchestrator
+    - 00-meta/rfc-review
+    - 00-meta/skill-creator
+    - 00-meta/validation-guard
+    - 04-tooling/build
+    - 04-tooling/commit
+    - 04-tooling/external-agent-delegation
+    - 04-tooling/mcp-troubleshooter
+    - 04-tooling/nuget-restore
+    - 04-tooling/repomix
+    - 04-tooling/unify-build
+    - 04-tooling/vendor-patches
+    - 04-tooling/vendor-restore
+
+mcp:
+  enabled: false
+
+hooks:
+  enabled: false

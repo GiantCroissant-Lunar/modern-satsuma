@@ -1,0 +1,32 @@
+# OpenCode CLI deployment.
+#
+# OpenCode natively reads .agents/skills/ and AGENTS.md. This file only
+# documents the CLI invocation -- the agents/ adapter handles the actual sync.
+
+tool: opencode
+display_name: OpenCode CLI
+status: active
+
+cli:
+  executable: opencode
+  non_interactive:
+    - opencode
+    - run
+    - --dir
+    - .
+    - --model
+    - "ollama-cloud/kimi-k2.6:cloud"
+    - "<task>"
+  notes:
+    - "Use --dangerously-skip-permissions only for tightly scoped trusted tasks."
+
+context:
+  primary_rules: AGENTS.md
+  skill_mirrors:
+    - .agents/skills
+
+mcp:
+  enabled: false
+
+hooks:
+  enabled: false
