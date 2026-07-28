@@ -1,0 +1,23 @@
+{
+  "$schema": "./build.config.schema.json",
+  "versionEnv": "GITVERSION_MAJORMINORPATCH",
+  "solution": "dotnet/framework/ModernSatsuma.sln",
+  "projectGroups": {
+    "packages": {
+      "sourceDir": "dotnet/framework/src",
+      "action": "pack",
+      "include": [
+        "ModernSatsuma",
+        "ModernSatsuma.Abstractions",
+        "ModernSatsuma.Drawing.SkiaSharp",
+        "ModernSatsuma.Drawing.SystemDrawing",
+        "ModernSatsuma.SourceGenerators"
+      ],
+      "exclude": []
+    }
+  },
+  "packProperties": {
+    "GeneratePackageOnBuild": "false"
+  },
+  "syncLocalNugetFeed": false
+}
