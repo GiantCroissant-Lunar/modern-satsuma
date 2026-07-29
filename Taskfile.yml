@@ -7,8 +7,50 @@ vars:
   HUB_CACHE: .hub-cache
   HUB_REPO: https://github.com/GiantCroissant-Lunar/lunar-snake-hub
   AGENT_SYMLINK: .agent
+  UNIFY: dotnet tool run unify-build --
+  SLN_PATH: dotnet/framework/ModernSatsuma.sln
+  GITVERSION_JSON: bash tools/gitversion.sh
 
 tasks:
+  # === .NET Build (unify-build) ===
+
+  tool:restore:
+    desc: Restore local dotnet tools
+    cmds:
+    - dotnet tool restore
+
+  restore:
+    desc: Restore dotnet tools (alias for tool:restore)
+    cmds:
+    - task: tool:restore
+
+  build:
+    desc: Build the solution using unify-build
+    deps: [tool:restore]
+    cmds:
+    - '{{.UNIFY}} Compile'
+
+  pack:
+    desc: Pack NuGet packages and sync to the local feed (version from GitVersion)
+    deps: [tool:restore]
+    cmds:
+    - '{{.UNIFY}} PackProjects --configuration Release'
+    env:
+      GITVERSION_MAJORMINORPATCH:
+        sh: '{{.GITVERSION_JSON}} | python -c "import sys,json;print(json.load(sys.stdin)[''MajorMinorPatch''])"'
+
+  test:
+    desc: Run tests
+    deps: [build]
+    cmds:
+    - dotnet test {{.SLN_PATH}} --configuration Release --no-build
+
+  version:
+    desc: Show computed version
+    deps: [tool:restore]
+    cmds:
+    - '{{.GITVERSION_JSON}} | python -c "import sys,json;d=json.load(sys.stdin);print(d[''FullSemVer''])"'
+
   # === Pre-commit Hook Setup ===
 
   precommit:setup:

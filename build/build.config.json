@@ -19,5 +19,6 @@
   "packProperties": {
     "GeneratePackageOnBuild": "false"
   },
-  "syncLocalNugetFeed": false
+  "syncLocalNugetFeed": true,
+  "localNugetFeedRoot": "../../packages/nuget"
 }
