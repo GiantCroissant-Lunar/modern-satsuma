@@ -1,10 +1,9 @@
-# Cross-CLI deployment via the open Agent Skills spec.
+# Cross-CLI deployment target via the open Agent Skills spec.
 #
 # Populates .agents/skills/ (read by Codex, Copilot, Kimi, OpenCode, Kilo
 # natively, plus Claude Code via the Agent Skills compat) and AGENTS.md
 # (read natively by Codex, Copilot, OpenCode, Kilo, plus Claude via the
 # CLAUDE.md import shim).
-# Qwen Code reads .qwen/skills/ via its own adapter; see ../qwen/config.yaml.
 # Pi is intentionally not an active adapter.
 
 tool: agents

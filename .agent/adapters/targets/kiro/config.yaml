@@ -1,4 +1,4 @@
-# Kiro IDE deployment.
+# Kiro IDE deployment target.
 #
 # Populates .kiro/skills/ (symlinks per skill) and .kiro/steering/<rule>.md
 # (one file per rule -- Kiro's native steering format, NOT a single AGENTS.md).

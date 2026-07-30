@@ -1,7 +1,7 @@
-# OpenCode CLI deployment.
+# OpenCode CLI runner profile.
 #
 # OpenCode natively reads .agents/skills/ and AGENTS.md. This file only
-# documents the CLI invocation -- the agents/ adapter handles the actual sync.
+# documents the CLI invocation -- the targets/agents adapter handles the actual sync.
 
 tool: opencode
 display_name: OpenCode CLI

@@ -1,4 +1,4 @@
-# Kilo Code CLI deployment.
+# Kilo Code CLI runner profile.
 #
 # Kilo Code is installed as both `kilo` and `kilocode`. CLI runs headless with
 # `kilo run`. Kilo natively reads .agents/skills/ and AGENTS.md, so it does not
