@@ -251,14 +251,14 @@ Before writing a status sentence, ask: **is there a skill that turns this claim 
 
 | Claim shape | Skill to invoke |
 |---|---|
-| "Live agent bridge / debug HTTP works in the player" | `@agent-bridge`, `@unity-window-capture` |
-| "Scene X loads cleanly" | `@scene-load-verifier`, `@play-mode-debugger` |
+| "Live runtime bridge / debug HTTP works in the player" | the owning project's runtime-bridge skill plus `@unity-editor-workflows` |
+| "Scene X loads cleanly" | `@unity-editor-workflows` plus the owning project's scene verifier, if present |
 | "Endpoint Y returns Z" | run `curl` against the live process — do NOT cite a doc |
 | "Build target produces output" | `@build` / `@unify-build`; check `build/_artifacts/` directly |
-| "Addressables hot-reload works" | `@addressables-hot-reload`, `@agent-playtest-loop` |
-| "Unity test asmdef X is wired in" | `@unity-mcp` test runner; check `Packages/manifest.json` testables array |
-| "Plugin DLL is in the build" | `@unitypackage-plugin-linking` audit; inspect `build/_artifacts/.../Managed/` |
-| "Visual / UI looks right" | `@unity-window-capture`, project-specific screenshot skill |
+| "Addressables hot-reload works" | the owning project's reload/playtest skill plus `@unity-data-authoring` |
+| "Unity test asmdef X is wired in" | `@unity-testing`; check `Packages/manifest.json` testables array |
+| "Plugin DLL is in the build" | `@unity-package-development`; inspect `build/_artifacts/.../Managed/` |
+| "Visual / UI looks right" | `@unity-editor-workflows` plus a project-specific screenshot skill |
 
 If a skill exists and fits, **use it.** If a skill exists but you cannot use it right now (Unity not open, build not running, etc.), say that explicitly: "the handover claims X — I haven't verified it this session because Unity isn't open."
 
@@ -270,7 +270,7 @@ Bad:
 > The inner content loop already works today. The 90% GREEN status on the handover is this loop.
 
 Good:
-> The handover from 2026-05-04 reported 90% GREEN on the L1 endpoint surface (last verified at 0.1.0-424). I haven't re-run the verification this session — the dev player isn't currently launched and AgentBridge has shipped fixes since. To confirm whether it still works, I should rebuild and use `@agent-bridge` against the running player.
+> The handover from 2026-05-04 reported 90% GREEN on the L1 endpoint surface (last verified at 0.1.0-424). I haven't re-run the verification this session — the dev player isn't currently launched and its runtime bridge has shipped fixes since. To confirm whether it still works, I should rebuild and use the project's current runtime-bridge skill against the running player.
 
 The good version names the source, names the staleness, and names the verification path. The bad version laundered all three.
 
